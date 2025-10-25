@@ -1,7 +1,9 @@
 export default function Home() {
   return (
     <div>
-      Sample WEB3 dApp
+      <h1>Sample WEB3 dApp</h1>
+
+
     </div>
   )
 }
