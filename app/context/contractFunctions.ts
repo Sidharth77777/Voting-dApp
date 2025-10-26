@@ -2,9 +2,10 @@ import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
 import { WalletConnectParamsTypes } from "@/types/types";
 
-export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void> => {
-    if (typeof window === 'undefined' || !window.ethereum) return;
 
+export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void > => {
+    if (typeof window === 'undefined' || !window.ethereum) return;
+    
     try{
         const provider: ethers.BrowserProvider = new ethers.BrowserProvider(window.ethereum);
         const signer: ethers.JsonRpcSigner = await provider.getSigner();
