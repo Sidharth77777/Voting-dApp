@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
-import { WalletConnectParamsTypes } from "@/types/types";
+import { WalletConnectParamsTypes, CandidateDataType, VoterDataType } from "@/types/types";
 
 // WALLET FUNCTIONS
 export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void > => {
@@ -54,8 +54,19 @@ export const fetchBalanceFunction = async(account:string, provider:ethers.Browse
 
 }
 
-
 // ORGANIZER FUNCTIONS
+export const getOwnerFunction = async(contract:ethers.Contract): Promise<string> => {
+    //if (!account || !contract) return;
+    
+    try {
+        const owner: string = await contract.votingOrganizer();
+        return owner;
+    } catch (err:any) {
+        console.error("Error getting contract owner !");
+        return "Error getting owner of contract !"
+    }
+}
+
 export const changeOwnerFunction = async(contract:ethers.Contract, address:string): Promise<string> => {
     // if(!account || !contract) return;
     if (!address) return 'No address provided !';
@@ -175,5 +186,86 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
         if (err?.reason === "Candidate already in group!") return "Candidate already in group!";
 
         return "Something went wrong while adding candidate to the group!";
+    }
+}
+
+// GETTER FUNCTIONS
+export const getCandidatesLengthFunction = async(contract:ethers.Contract): Promise<number> => {
+    //if(!account || !contract) return;
+
+    try {
+        const candidatesLengthInWei: ethers.BigNumberish = await contract.getCandidatesLength();
+        const candidatesLength: number = Number(candidatesLengthInWei);
+
+        return candidatesLength;
+    } catch(err:any) {
+        console.error("Error getting length of candidates !", err);
+
+        return 0;
+    }
+}
+
+export const getCandidateDataFunction = async(contract:ethers.Contract, candidateAddress:string): Promise<CandidateDataType |string> => {
+    //if(!account || !contract) return;
+    if (!candidateAddress) return 'No address provided !';
+    if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
+
+    try {
+        const data = await contract.getCandidateData(candidateAddress);
+        const candidateData: CandidateDataType = {
+            id: Number(data.id),
+            name: data.name,
+            candidateAddress: data.candidateAddress,
+            age: Number(data.age),
+            image: data.image,
+            ipfs: data.ipfs,
+            voteCount: Number(data.voteCount),
+            exists: data.exists,
+        };
+
+        return candidateData;
+    } catch(err:any) {
+        console.error("Error getting Candidate Data !", err);
+        return "Something went wrong while getting candidate data";
+    }
+}
+
+export const getVotersLengthFunction = async(contract:ethers.Contract): Promise<number> => {
+    //if (!account || !contract) return;
+
+    try {
+        const votersLengthInWei: ethers.BigNumberish = await contract.getVotersLength();
+        const votersLength: number = Number(votersLengthInWei);
+
+        return votersLength;
+    } catch(err:any) {
+        console.error("Error getting voters length !");
+
+        return 0;
+    }
+}
+
+export const getVoterDataFunction = async(contract:ethers.Contract, address:string): Promise<VoterDataType | string> => {
+    // if(!account || !contract) return;
+    if (!address) return 'No address provided !';
+    if (!ethers.isAddress(address)) return 'Invalid Ethereum address !';
+
+    try {
+        const data = await contract.getVoterData(address);
+        const voterData: VoterDataType = {
+            id: data.id,
+            name: data.name,
+            voterAddress: data.voterAddress,
+            age: data.age,
+            image: data.image,
+            ipfs: data.string,
+            voteCount: data.voteCount,
+            exists: data.exists,
+        }
+
+        return voterData;
+    } catch(err:any) {
+        console.error("Error getting voter data !",err);
+        return 'Error getting voter data !'
     }
 }

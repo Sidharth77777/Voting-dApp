@@ -19,5 +19,27 @@ export interface WalletConnectParamsTypes {
 
 export interface WithSideBarType extends Web3ContextType {
     sideBarToggle: boolean,
-    setSideBarToggle: (sideBarToggle:boolean) => void;
+    setSideBarToggle: (sideBarToggle: boolean) => void;
+}
+
+export interface CandidateDataType {
+    id: number;
+    name: string;
+    candidateAddress: string;
+    age: number;
+    image: string;
+    ipfs: string;
+    voteCount: number;
+    exists: boolean;
+}
+
+export interface VoterDataType {
+    id: number;
+    name: string;
+    voterAddress: string;
+    age: number;
+    image: string;
+    ipfs: string;
+    voteCount: number;
+    exists: boolean;
 }
