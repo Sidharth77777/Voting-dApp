@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function SideBar() {
     const {sideBarToggle} = useWeb3();
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 640);

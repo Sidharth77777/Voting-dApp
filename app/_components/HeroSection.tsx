@@ -5,13 +5,13 @@ import { WalletConnectParamsTypes } from "@/types/types";
 import { connectWalletFunction } from "../context/contractFunctions";
 import { useToast } from "./Toast";
 import { Button } from "@/components/ui/button";
-import { bg, fg, primary, primaryFg, secondary, mutedFg, accent } from "@/colors";
+import { bg, fg, primary, primaryFg, mutedFg } from "@/colors";
 
 export default function HeroSection() {
   const { account, setAccount, setContract, setProvider } = useWeb3();
   let { showToast } = useToast();
 
-  const connectWallet = async (): Promise<void> => {
+  const connectWallet = async(): Promise<void> => {
     const walletConnectParams: WalletConnectParamsTypes | void = await connectWalletFunction();
     if (walletConnectParams) {
       setAccount(walletConnectParams.account);

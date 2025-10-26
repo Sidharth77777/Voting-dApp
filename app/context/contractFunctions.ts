@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
 import { WalletConnectParamsTypes } from "@/types/types";
 
-
+// WALLET FUNCTIONS
 export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void > => {
     if (typeof window === 'undefined' || !window.ethereum) return;
     
@@ -40,7 +40,6 @@ export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes |
 }
 
 export const fetchBalanceFunction = async(account:string, provider:ethers.BrowserProvider): Promise<string | null> => {
-    if (!window.ethereum) return null;
     if (!account || !provider) return null;
 
     try {
@@ -53,4 +52,128 @@ export const fetchBalanceFunction = async(account:string, provider:ethers.Browse
         return null;
     }
 
+}
+
+
+// ORGANIZER FUNCTIONS
+export const changeOwnerFunction = async(contract:ethers.Contract, address:string): Promise<string> => {
+    // if(!account || !contract) return;
+    if (!address) return 'No address provided !';
+
+    try{
+        if (!ethers.isAddress(address)) {
+            return 'Invalid Ethereum address !';
+        }
+
+        const tx = await contract.changeOwner(address);
+        await tx.wait();
+        
+        return 'success';
+    } catch (error:any) {
+        console.error("Error changing owner !", error);
+        if (error.reason === "Only organizer can do it!") return "Only organizer can do it !";
+
+        return "Something went wrong !";
+        // Toast msg frontend
+    }
+}
+
+export const createGroupFunction = async (contract: ethers.Contract, name: string, image: string, ipfs: string, requiresRegisteredVoters: boolean, startDate: string, endDate: string): Promise<string> => {
+    //if(!account || !contract) return;
+    // e.g. "2025-10-31T15:00Z"
+    if (!name) return "Group name is mandatory!";
+    try {
+        const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
+        const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+
+        if (isNaN(startTimestamp) || isNaN(endTimestamp)) {
+        return "Invalid date format!";
+        }
+
+        if (startTimestamp >= endTimestamp) {
+        return "Start time must be before end time!";
+        }
+
+        if (endTimestamp <= currentTimestamp) {
+        return "End time must be in the future!";
+        }
+
+        const tx = await contract.createGroup(name, image, ipfs, requiresRegisteredVoters, startTimestamp, endTimestamp);
+        await tx.wait();
+
+        return "success";
+    } catch (err: any) {
+        console.error("Error creating group!", err);
+
+        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
+        if (err?.reason === "Start time must be before end time!") return "Start time must be before end time!";
+        if (err?.reason === "End time must be in the future!") return "End time must be in the future!";
+
+        return "Something went wrong while creating the group!";
+    }
+};
+
+export const deleteGroupFunction = async(contract:ethers.Contract, groupId:number): Promise<string> => {
+    //if(!account || !contract) return;
+    if (!groupId) return 'No group ID provided !';
+
+    try{
+        const tx = await contract.deleteGroup(groupId);
+        await tx.wait();
+
+        return 'success'
+    } catch (err:any) {
+        console.error("Error creating group!", err);
+
+        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
+        if (err?.reason === "No group exists!") return "No group exists!";
+
+        return "Something went wrong while deleting the group!";
+    }
+}
+
+export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<string> => {
+    //if(!account || !contract) return;
+    if (!groupId) return 'No group ID provided !';
+    if (!candidateAddress) return 'No address provided !'
+    if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
+
+    try{
+        const tx = await contract.deleteCandidateFromGroup(groupId, candidateAddress);
+        await tx.wait();
+
+        return 'success';
+    } catch(err:any) {
+        console.error("Error deleting candidate from group!", err);
+
+        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
+        if (err?.reason === "Group does not exist!") return "Group does not exist!";
+        if (err?.reason === "Candidate not in this group!") return "Candidate not in this group!";
+
+        return "Something went wrong while deleting candidate from the group!";
+    }
+}
+
+export const addCandidateToGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<string> => {
+    //if(!account || !contract) return;
+    if (!groupId) return 'No group ID provided !';
+    if (!candidateAddress) return 'No address provided !'
+    if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
+
+    try {
+        const tx = await contract.addCandidateToGroup(groupId, candidateAddress);
+        await tx.wait();
+
+        return 'success';
+    } catch(err:any) {
+        console.error("Error adding candidate to the group!", err);
+
+        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
+        if (err?.reason === "Group doesn't exist!") return "Group doesn't exist!";
+        if (err?.reason === "Candidate does not exist!") return "Candidate does not exist!";
+        if (err?.reason === "Candidate already in group!") return "Candidate already in group!";
+
+        return "Something went wrong while adding candidate to the group!";
+    }
 }
