@@ -2,21 +2,23 @@
 
 import { createContext, useContext, ReactNode, useState } from "react";
 import { ethers } from "ethers";
-import { Web3ContextType } from "@/types/types";
+import { Web3ContextType, WithSideBarType } from "@/types/types";
 
-const Web3Context = createContext<Web3ContextType | undefined>(undefined);
+const Web3Context = createContext<WithSideBarType | undefined>(undefined);
 
 export const Web3Provider = ({children} : {children: ReactNode}) => {
     const [account, setAccount] = useState<string | null>(null);
     const [contract, setContract] = useState<ethers.Contract | null>(null);
     const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
     const [balance, setBalance] = useState<string | null>(null);
+    const [sideBarToggle, setSideBarToggle] = useState<boolean>(false);
 
-    const values: Web3ContextType = {
+    const values: WithSideBarType = {
         account, setAccount,
         contract, setContract,
         provider, setProvider,
         balance, setBalance,
+        sideBarToggle, setSideBarToggle,
     };
 
     return (

@@ -16,3 +16,8 @@ export interface WalletConnectParamsTypes {
     contract: ethers.Contract;
     provider: ethers.BrowserProvider;
 }
+
+export interface WithSideBarType extends Web3ContextType {
+    sideBarToggle: boolean,
+    setSideBarToggle: (sideBarToggle:boolean) => void;
+}

@@ -3,7 +3,7 @@ import {
   connectWalletFunction,
   fetchBalanceFunction,
 } from "../context/contractFunctions";
-import { Web3ContextType, WalletConnectParamsTypes } from "@/types/types";
+import { WalletConnectParamsTypes, WithSideBarType } from "@/types/types";
 import { useWeb3 } from "../context/Web3Context";
 import { ethers } from "ethers";
 import { useEffect } from "react";
@@ -11,9 +11,10 @@ import Image from "next/image";
 import ETH from "./../images/ethereum-original.svg";
 import Link from "next/link";
 import { useToast } from "./Toast";
+import { PanelLeftClose, PanelRightClose } from "lucide-react";
 
 export default function Header() {
-  const {account, provider, balance, setBalance, setAccount, setContract, setProvider}: Web3ContextType = useWeb3();
+  const {account, provider, balance,sideBarToggle, setBalance, setAccount, setContract, setProvider, setSideBarToggle}: WithSideBarType = useWeb3();
   let {showToast} = useToast();
 
   const connectWallet = async (): Promise<void> => {
@@ -63,19 +64,27 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-gray-900/80 text-white shadow-lg border-b border-gray-800">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between px-6 py-4 gap-3 sm:gap-0">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text">
+      <div className="flex sm:flex-row items-center justify-between px-2 py-4 gap-3 sm:gap-0">
+        <div className="flex sm:gap-20 gap-3 justify-center items-center">
+        <div>
+          {sideBarToggle ? 
+            <PanelRightClose className="cursor-pointer" onClick={() => setSideBarToggle(!sideBarToggle)} /> 
+            : <PanelLeftClose className="cursor-pointer" onClick={() => setSideBarToggle(!sideBarToggle)} />
+          }
+        </div>
+        <h1 className="text-lg sm:text-3xl font-semibold tracking-tight bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text">
           <Link href="/">Voting DApp</Link>
         </h1>
+        </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {account ? (
             <>
-              <span className="px-3 py-2 bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
+              <span className="px-3 py-1 bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
                 {`${account.slice(0, 4)}...${account.slice(-4)}`}
               </span>
 
-              <span className="px-3 py-2 bg-gray-800 rounded-xl text-sm flex items-center gap-1 border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
+              <span className="px-3 py-1 bg-gray-800 rounded-xl text-sm flex items-center gap-1 border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
                 <Image
                   alt="ETH"
                   src={ETH}
@@ -104,5 +113,6 @@ export default function Header() {
         </div>
       </div>
     </header>
+
   );
 }
