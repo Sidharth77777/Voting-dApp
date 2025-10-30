@@ -27,7 +27,7 @@ export default function LayoutProvider({children}: {children: React.ReactNode}) 
                 key="content-wrapper"
                 initial={false}
                 animate={{
-                    marginLeft: sideBarToggle && !isMobile ? "16rem" : "", marginRight: isMobile ? "0" : "2rem", opacity: 1,}}
+                    marginLeft: sideBarToggle && !isMobile ? "16rem" : "", marginRight: isMobile ? "0" : "0", opacity: 1,}}
                     transition={{ stiffness: 80, damping: 20, duration: 0.1,}}
                     className={`${isMobile ? "" : "mx-12"} transition-all duration-300`}
                 >

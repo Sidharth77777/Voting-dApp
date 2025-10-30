@@ -51,3 +51,17 @@ export interface SideBarMenuType {
     icon: LucideIcon;
     path: string;
 }
+
+export interface WorkFlowType {
+    id: number;
+    icon: LucideIcon;
+    head: string;
+    p: string;
+}
+
+export interface ListFeaturesType {
+    id:number; 
+    color: string;
+    name: string;
+        
+}
