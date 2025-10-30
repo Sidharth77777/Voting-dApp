@@ -5,7 +5,7 @@ import { WalletConnectParamsTypes } from "@/types/types";
 import { connectWalletFunction } from "../context/contractFunctions";
 import { useToast } from "./Toast";
 import { Button } from "@/components/ui/button";
-import { bg, fg, primary, primaryFg, mutedFg } from "@/colors";
+import { Wallet } from "lucide-react";
 
 export default function HeroSection() {
   const { account, setAccount, setContract, setProvider } = useWeb3();
@@ -38,50 +38,40 @@ export default function HeroSection() {
 
   return (
     <div
-      className="relative flex justify-center items-center flex-col gap-8 text-left px-6 py-24 lg:px-0 overflow-hidden"
-      style={{ backgroundColor: bg, color: fg }}
+  className="min-h-screen w-full flex flex-col justify-center items-center text-center px-6 bg-[#0f0f1a] text-[#e2e2f5] relative overflow-hidden"
+>
+  <div className="absolute -top-40 -left-40 w-[30rem] h-[30rem] bg-[#a48fff]/20 blur-[120px] rounded-full"></div>
+  <div className="absolute bottom-0 -right-40 w-[25rem] h-[25rem]  blur-[100px] rounded-full"></div>
+
+  <h1 className="font-extrabold leading-tight tracking-tight text-4xl sm:text-5xl lg:text-6xl max-w-3xl z-10">
+    Welcome to the{" "}
+    <span className="bg-gradient-to-r from-[#a48fff] via-[#7986cb] to-[#64b5f6] text-transparent bg-clip-text">
+      Ethereum Based Voting
+    </span>{" "}
+    <span className="text-[#a48fff]">DApp</span>
+  </h1>
+
+  <h3 className="opacity-80 mt-6 mb-10 text-lg sm:text-xl max-w-2xl z-10">
+    Secure, decentralized, and transparent voting on the blockchain.{" "}
+    <br className="hidden sm:block" />
+    Your voice matters in the future of governance.
+  </h3>
+
+  <div className="flex flex-wrap gap-4 justify-center z-10">
+    <Button
+      onClick={connectWallet}
+      className="bg-[#a48fff] cursor-pointer hover:bg-[#8265ff] text-[#0f0f1a] font-semibold px-6 py-3 rounded-xl text-lg shadow-lg transition-all flex items-center gap-2"
     >
-      <h1
-        className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-center tracking-tight"
-        style={{ color: primary }}
-      >
-        Ethereum Blockchain
-      </h1>
+      Connect <Wallet className="w-5 h-5" />
+    </Button>
 
-      <h2
-        className="text-3xl sm:text-4xl lg:text-5xl text-center font-semibold"
-        style={{ color: fg }}
-      >
-        Based Decentralized Voting
-      </h2>
+    <Button
+      className="bg-transparent cursor-pointer border border-[#a48fff]/40 hover:border-[#a48fff] text-[#e2e2f5] font-semibold px-6 py-3 rounded-xl text-lg shadow-lg transition-all"
+    >
+      Start Voting
+    </Button>
+  </div>
+</div>
 
-      <p
-        className="text-lg sm:text-xl text-center max-w-2xl leading-relaxed opacity-80"
-        style={{ color: mutedFg }}
-      >
-        Secure, decentralized, and transparent voting on the blockchain.
-        Connect your wallet to start participating in governance today.
-      </p>
-
-      {!account ? <Button
-        onClick={connectWallet}
-        className="px-8 cursor-pointer py-4 rounded-2xl font-semibold text-lg shadow-2xl transform transition-all hover:scale-105 hover:shadow-xl"
-        style={{
-          background: `linear-gradient(${primary})`,
-          color: primaryFg,
-        }}
-      >
-        Connect Wallet
-      </Button> : 
-      <Button
-        className="px-8 cursor-pointer py-4 rounded-2xl font-semibold text-lg shadow-2xl transform transition-all hover:scale-105 hover:shadow-xl"
-        style={{
-          background: `linear-gradient(${primary})`,
-          color: primaryFg,
-        }}>
-        Cast your vote
-      </Button>
-      }
-    </div>
   );
 }

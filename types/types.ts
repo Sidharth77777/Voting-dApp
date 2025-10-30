@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { LucideIcon } from "lucide-react";
 
 export interface Web3ContextType {
     account: string | null;
@@ -42,4 +43,11 @@ export interface VoterDataType {
     ipfs: string;
     voteCount: number;
     exists: boolean;
+}
+
+export interface SideBarMenuType {
+    id: number;
+    name: string;
+    icon: LucideIcon;
+    path: string;
 }
