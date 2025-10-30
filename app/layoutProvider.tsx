@@ -6,6 +6,7 @@ import { ToastProvider } from "./_components/Toast";
 import { useState, useEffect } from "react";
 import { useWeb3 } from "./context/Web3Context";
 import { motion } from "framer-motion";
+import Footer from "./_components/Footer";
 
 export default function LayoutProvider({children}: {children: React.ReactNode}) {
     const [isMobile, setIsMobile] = useState(false);
@@ -33,6 +34,8 @@ export default function LayoutProvider({children}: {children: React.ReactNode}) 
                 <ToastProvider>
                     {children}
                 </ToastProvider>
+                
+                <Footer />
             </motion.div>
         </div>
     )
