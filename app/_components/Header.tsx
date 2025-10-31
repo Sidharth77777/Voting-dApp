@@ -11,7 +11,7 @@ import Image from "next/image";
 import ETH from "./../images/ethereum-original.svg";
 import Link from "next/link";
 import { useToast } from "./Toast";
-import { PanelLeftClose, PanelRightClose } from "lucide-react";
+import { PanelLeftClose, PanelRightClose, Wallet } from "lucide-react";
 
 export default function Header() {
   const {account, provider, balance,sideBarToggle, setBalance, setAccount, setContract, setProvider, setSideBarToggle}: WithSideBarType = useWeb3();
@@ -105,9 +105,9 @@ export default function Header() {
           ) : (
             <button
               onClick={connectWallet}
-              className="bg-linear-to-r cursor-pointer bg-[#987eea] hover:bg-[#5021ec] text-white px-5 py-2 rounded-xl font-semibold text-sm transition-all shadow-md"
+              className="bg-linear-to-r cursor-pointer flex justify-center items-center gap-2 bg-[#987eea] hover:bg-[#5021ec] text-white px-5 py-2 rounded-xl font-semibold text-sm transition-all shadow-md"
             >
-              Connect Wallet
+              Connect Wallet <Wallet className="w-5" />
             </button>
           )}
         </div>
