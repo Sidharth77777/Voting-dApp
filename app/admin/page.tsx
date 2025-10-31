@@ -5,6 +5,7 @@ import { useWeb3 } from "../context/Web3Context";
 import { getOwnerFunction } from "../context/contractFunctions";
 import { motion } from "framer-motion";
 import { ShieldCheck, LockKeyhole, Wallet } from "lucide-react";
+import ConnectWalletPage from "../_components/ConnectWallet";
 
 export default function Admin() {
 	const { account, contract } = useWeb3();
@@ -31,22 +32,7 @@ export default function Admin() {
 	};
 
 	if (!account)
-		return (
-			<motion.div
-				variants={fade}
-				initial="hidden"
-				animate="visible"
-				className="flex min-h-screen flex-col items-center justify-center h-[80vh] text-center"
-			>
-				<Wallet className="w-16 h-16 text-yellow-400 mb-4" />
-				<h2 className="text-2xl font-semibold text-gray-200 mb-2">
-					Connect Your Wallet
-				</h2>
-				<p className="text-gray-400 max-w-md">
-					Please connect your wallet to access the admin dashboard.
-				</p>
-			</motion.div>
-		);
+		return <ConnectWalletPage />
 
 	if (account?.toLowerCase() === owner?.toLowerCase())
 		return (
@@ -54,7 +40,7 @@ export default function Admin() {
 				variants={fade}
 				initial="hidden"
 				animate="visible"
-				className="flex min-h-screen flex-col items-center justify-center h-[80vh] text-center"
+				className="flex min-h-sc flex-col items-center justify-center h-[80vh] text-center"
 			>
 				<ShieldCheck className="w-20 h-20 text-green-500 mb-4" />
 				<h1 className="text-3xl font-bold text-green-400 mb-2">
