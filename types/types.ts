@@ -62,6 +62,10 @@ export interface WorkFlowType {
 export interface ListFeaturesType {
     id:number; 
     color: string;
-    name: string;
-        
+    name: string;    
+}
+
+export interface ContextType extends WithSideBarType {
+    profile: VoterDataType | null;
+    setProfile: (profile: VoterDataType | null) => void;
 }

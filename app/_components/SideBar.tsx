@@ -22,12 +22,14 @@ import {
   sidebarBorder,
   sidebarRing,
 } from "@/colors";
+import { usePathname } from "next/navigation";
 
 export default function SideBar() {
   const { sideBarToggle, setSideBarToggle } = useWeb3();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [activeId, setActiveId] = useState<number | null>(null);
   const sideBarRef = useRef<HTMLDivElement>(null);
+  const pathname: string = usePathname();
 
   const [sideBarMenu] = useState<SideBarMenuType[]>([
     { id: 1, name: "Home", icon: Home, path: "/" },
@@ -38,10 +40,9 @@ export default function SideBar() {
   ]);
 
   useEffect(() => {
-    const currentPath = window.location.pathname;
-    const current = sideBarMenu.find((item) => item.path === currentPath);
+    const current = sideBarMenu.find((item) => item.path === pathname);
     if (current) setActiveId(current.id);
-  }, [sideBarMenu]);
+  }, [sideBarMenu, pathname]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -99,7 +100,7 @@ export default function SideBar() {
               onClick={() => setActiveId(s.id)}
               className={`
                 group flex items-center
-                ${sideBarToggle ? "px-5 py-3" : "p-3 justify-center"}
+                ${sideBarToggle ? "px-10 py-3" : "p-3 justify-center"}
                 mb-4 rounded-2xl
                 transition-all duration-300 ease-in-out
                 shadow-sm hover:shadow-md

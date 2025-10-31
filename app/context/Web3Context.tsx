@@ -2,9 +2,9 @@
 
 import { createContext, useContext, ReactNode, useState } from "react";
 import { ethers } from "ethers";
-import { WithSideBarType } from "@/types/types";
+import { VoterDataType, WithSideBarType, ContextType } from "@/types/types";
 
-const Web3Context = createContext<WithSideBarType | undefined>(undefined);
+const Web3Context = createContext<ContextType | undefined>(undefined);
 
 export const Web3Provider = ({children} : {children: ReactNode}) => {
     const [account, setAccount] = useState<string | null>(null);
@@ -12,13 +12,15 @@ export const Web3Provider = ({children} : {children: ReactNode}) => {
     const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
     const [balance, setBalance] = useState<string | null>(null);
     const [sideBarToggle, setSideBarToggle] = useState<boolean>(true);
+    const [profile, setProfile] = useState<VoterDataType | null>(null);
 
-    const values: WithSideBarType = {
+    const values: ContextType = {
         account, setAccount,
         contract, setContract,
         provider, setProvider,
         balance, setBalance,
         sideBarToggle, setSideBarToggle,
+        profile, setProfile,
     };
 
     return (

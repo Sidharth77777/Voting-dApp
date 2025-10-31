@@ -14,7 +14,7 @@ export default function HeroSection() {
   const router: AppRouterInstance = useRouter();
   let { showToast } = useToast();
 
-  const connectWallet = async(): Promise<void> => {
+  const connectWallet = async (): Promise<void> => {
     const walletConnectParams: WalletConnectParamsTypes | void = await connectWalletFunction();
     if (walletConnectParams) {
       setAccount(walletConnectParams.account);
@@ -41,41 +41,41 @@ export default function HeroSection() {
 
   return (
     <div
-  className="min-h-screen w-full flex flex-col justify-center items-center text-center px-6 bg-[#0f0f1a] text-[#e2e2f5] relative overflow-hidden"
->
-  <div className="absolute -top-40 -left-40 w-[30rem] h-[30rem] bg-[#a48fff]/20 blur-[120px] rounded-full"></div>
-  <div className="absolute bottom-0 -right-40 w-[25rem] h-[25rem]  blur-[100px] rounded-full"></div>
-
-  <h1 className="font-extrabold leading-tight tracking-tight text-4xl sm:text-5xl lg:text-6xl max-w-3xl z-10">
-    Welcome to the Testnet{" "} <br />
-    <span className="bg-gradient-to-r from-[#a48fff] via-[#7986cb] to-[#64b5f6] text-transparent bg-clip-text">
-      Ethereum Based Voting
-    </span>{" "}
-    <span className="text-[#a48fff]">DApp</span>
-  </h1>
-
-  <h3 className="opacity-80 mt-6 mb-10 text-lg sm:text-xl max-w-2xl z-10">
-    Secure, decentralized, and transparent voting on the blockchain.{" "}
-    <br className="hidden sm:block" />
-    Your voice matters in the future of governance.
-  </h3>
-
-  <div className="flex flex-wrap gap-4 justify-center z-10">
-    <Button
-      onClick={connectWallet}
-      className="bg-[#a48fff] cursor-pointer hover:bg-[#8265ff] text-[#0f0f1a] font-semibold sm:p-8 p-6 rounded-xl text-lg shadow-lg transition-all flex items-center gap-2"
+      className="min-h-screen w-full flex flex-col justify-center items-center text-center px-6 bg-[#0f0f1a] text-[#e2e2f5] relative overflow-hidden"
     >
-      Connect <Wallet className="w-5 h-5" />
-    </Button>
+      <div className="absolute -top-40 -left-40 w-[30rem] h-[30rem] bg-[#a48fff]/20 blur-[120px] rounded-full"></div>
+      <div className="absolute bottom-0 -right-40 w-[25rem] h-[25rem]  blur-[100px] rounded-full"></div>
 
-    <Button
-      onClick={() => router.push('/vote')}
-      className="bg-transparent cursor-pointer border border-[#a48fff]/40 hover:border-[#a48fff] text-[#e2e2f5] font-semibold sm:p-8 p-6 rounded-xl text-lg shadow-lg transition-all"
-    >
-      Start Voting
-    </Button>
-  </div>
-</div>
+      <h1 className="font-extrabold leading-tight tracking-tight text-4xl sm:text-5xl lg:text-6xl max-w-3xl z-10">
+        Welcome to the Testnet{" "} <br />
+        <span className="bg-linear-to-r from-[#a48fff] via-[#7986cb] to-[#64b5f6] text-transparent bg-clip-text">
+          Ethereum Based Voting
+        </span>{" "}
+        <span className="text-[#a48fff]">DApp</span>
+      </h1>
+
+      <h3 className="opacity-80 mt-6 mb-10 text-lg sm:text-xl max-w-2xl z-10">
+        Secure, decentralized, and transparent voting on the blockchain.{" "}
+        <br className="hidden sm:block" />
+        Your voice matters in the future of governance.
+      </h3>
+
+      <div className="flex flex-wrap gap-4 justify-center z-10">
+        <Button
+          onClick={connectWallet}
+          className="bg-[#a48fff] cursor-pointer hover:bg-[#8265ff] text-[#0f0f1a] font-semibold sm:p-8 p-6 rounded-xl text-lg shadow-lg transition-all flex items-center gap-2"
+        >
+          Connect <Wallet className="w-5 h-5" />
+        </Button>
+
+        <Button
+          onClick={() => router.push('/vote')}
+          className="bg-transparent cursor-pointer border border-[#a48fff]/40 hover:border-[#a48fff] text-[#e2e2f5] font-semibold sm:p-8 p-6 rounded-xl text-lg shadow-lg transition-all"
+        >
+          Start Voting
+        </Button>
+      </div>
+    </div>
 
   );
 }

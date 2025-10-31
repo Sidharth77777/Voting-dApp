@@ -5,12 +5,12 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="w-full mt-10 border-t border-slate-800 bg-[#0a0a0a] text-slate-300">
+    <footer className="w-full border-t border-slate-800 bg-[#0a0a0a] text-slate-300">
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="flex sm:flex-row flex-col justify-between sm:items-center mb-10 gap-5">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="p-2 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 text-white">
+              <div className="p-2 rounded-lg bg-linear-to-tr from-indigo-500 to-purple-500 text-white">
                 <PiStackSimpleFill size={28} />
               </div>
               <div>
@@ -26,10 +26,10 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-3 text-lg">Platform</h3>
             <ul className="space-y-2 text-slate-400">
-              <li><Link href="#HowItWorks" className="hover:text-white transition">How it Works</Link></li>
+              <li><Link href="/#HowItWorks" className="hover:text-white transition">How it Works</Link></li>
               <li><Link href="#" className="hover:text-white transition">Candidates</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Vote</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Results</Link></li>
+              <li><Link href="/vote" className="hover:text-white transition">Vote</Link></li>
+              <li><Link href="/results" className="hover:text-white transition">Results</Link></li>
             </ul>
           </div>
 

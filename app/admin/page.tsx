@@ -40,7 +40,7 @@ export default function Admin() {
 				variants={fade}
 				initial="hidden"
 				animate="visible"
-				className="flex min-h-sc flex-col items-center justify-center h-[80vh] text-center"
+				className="flex min-h-screen flex-col items-center justify-center h-[80vh] text-center"
 			>
 				<ShieldCheck className="w-20 h-20 text-green-500 mb-4" />
 				<h1 className="text-3xl font-bold text-green-400 mb-2">
