@@ -1,7 +1,7 @@
 "use client";
 import { motion, Variants } from "framer-motion";
 import { useWeb3 } from "../context/Web3Context";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   ChartNoAxesColumn,
   Home,
@@ -24,9 +24,10 @@ import {
 } from "@/colors";
 
 export default function SideBar() {
-  const { sideBarToggle } = useWeb3();
+  const { sideBarToggle, setSideBarToggle } = useWeb3();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const sideBarRef = useRef<HTMLDivElement>(null);
 
   const [sideBarMenu] = useState<SideBarMenuType[]>([
     { id: 1, name: "Home", icon: Home, path: "/" },
@@ -49,6 +50,19 @@ export default function SideBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e:MouseEvent) => {
+      if (sideBarRef.current && !sideBarRef.current.contains(e.target as Node)) {
+        if (sideBarToggle && isMobile) {
+          setSideBarToggle(false);
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {document.removeEventListener('mousedown', handleClickOutside)};
+  }, [sideBarToggle, isMobile, setSideBarToggle])
+
   const sidebar_animation: Variants = {
     open: {
       width: "16rem",
@@ -63,12 +77,12 @@ export default function SideBar() {
 
   return (
     <motion.div
+      ref={sideBarRef}
       variants={sidebar_animation}
       initial={false}
       animate={sideBarToggle ? "open" : "closed"}
-      className={`${
-        isMobile ? "mt-27" : "p-1 mt-17"
-      } z-50 max-w-[16rem] w-[16rem] fixed overflow-hidden h-screen`}
+      className={`${isMobile ? "mt-27" : "p-1 mt-17"
+        } z-50 max-w-[16rem] w-[16rem] fixed overflow-hidden h-screen`}
       style={{
         backgroundColor: sidebarBg,
         color: sidebarFg,
