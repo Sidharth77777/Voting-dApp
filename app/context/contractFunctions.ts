@@ -1,6 +1,14 @@
 import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
 import { WalletConnectParamsTypes, CandidateDataType, VoterDataType } from "@/types/types";
+import { pinata } from "@/config/pinataConfig";
+
+export const pinataCheck = async() => {
+    if (pinata) console.log('pinata connection successfull')
+    else console.log("PINATA ERROR !!!")
+}
+
+
 
 // WALLET FUNCTIONS
 export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void > => {
@@ -189,7 +197,46 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
     }
 }
 
+// APPLY FUNCTIONS
+export const applyToBeVoterFunction = async(contract:ethers.Contract, name:string, address:string, age:number, image:string, ipfs:string): Promise<boolean | string> => {
+    // if (!account || !contract) return;
+    try {
+
+        return true;
+    } catch (err:any) {
+        console.error('Error while applying',err)
+
+        if (err?.reason === "Already an approved voter!") return "Already an approved voter!";
+        if (err?.reason === "Already applied!") return "Already applied!";
+
+        return "Something went wrong while applying !";
+    }
+}
+
 // GETTER FUNCTIONS
+export const getProfileFunction = async(contract:ethers.Contract, account:string): Promise<string | VoterDataType> => {
+    // if (!account || !contract) return;
+    try {
+        const profile = await contract.voters(account);
+        const Voter: VoterDataType = {
+            id: Number(profile[0]),
+            name: profile[1],
+            voterAddress: profile[2],
+            age: Number(profile[3]),
+            image: profile[4],
+            ipfs: profile[5],
+            voteCount: Number(profile[6]),
+            exists: profile[7],
+        }
+
+        return Voter;
+
+    } catch (err:any) {
+        console.error('Error fetching profile !',err);
+        return "Something went wrong while fetching profile !";
+    }
+}
+
 export const getCandidatesLengthFunction = async(contract:ethers.Contract): Promise<number> => {
     //if(!account || !contract) return;
 

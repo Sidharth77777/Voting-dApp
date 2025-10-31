@@ -66,7 +66,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-gray-900/80 text-white shadow-lg border-b border-gray-800">
       <div className="flex relative sm:flex-row flex-col items-center justify-between px-2 py-4 gap-3 sm:gap-0">
         <div className="flex sm:gap-20 gap-3 justify-center items-center">
-        <div className="absolute left-0 top-[50%]">
+        <div className="absolute left-0 top-[30%]">
           {sideBarToggle ? 
             <PanelRightClose className="cursor-pointer opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} /> 
             : <PanelLeftClose className="cursor-pointer opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
@@ -80,7 +80,7 @@ export default function Header() {
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {account ? (
             <>
-              <span className="px-3 py-1 bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
+              <span className="px-3 py-1 font-mono bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
                 {`${account.slice(0, 4)}...${account.slice(-4)}`}
               </span>
 

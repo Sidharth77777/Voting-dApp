@@ -7,9 +7,9 @@ export default function Vote() {
     const {account} = useWeb3();
 
     if (!account) return <ConnectWalletPage />
-    
+
     return (
-        <div>
+        <div className="min-h-screen">
             VOTE
         </div>
     )

@@ -8,7 +8,7 @@ export default function Results() {
 
     if (!account) return <ConnectWalletPage />
     return (
-        <div>
+        <div className="min-h-screen">
             RESULTS
         </div>
     )
