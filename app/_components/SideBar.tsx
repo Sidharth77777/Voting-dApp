@@ -90,7 +90,7 @@ export default function SideBar() {
         borderRight: `1px solid ${sidebarBorder}`,
       }}
     >
-      <div className="flex flex-col mt-6">
+      <div className={`${!sideBarToggle && !isMobile ? 'sm:px-0' : 'px-3'} flex flex-col mt-6 `}>
         {sideBarMenu.map((s) => {
           const isActive = s.id === activeId;
           return (

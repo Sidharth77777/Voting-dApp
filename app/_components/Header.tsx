@@ -13,6 +13,8 @@ import ETH from "./../images/ethereum-original.svg";
 import Link from "next/link";
 import { useToast } from "./Toast";
 import { PanelLeftClose, PanelRightClose, Wallet } from "lucide-react";
+import { IoIosLogOut } from "react-icons/io";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
 	const { account, contract, provider, balance, sideBarToggle, setBalance, setAccount, setContract, setProvider, setSideBarToggle, profile, setProfile }: ContextType = useWeb3();
@@ -97,12 +99,12 @@ export default function Header() {
 		<header className="sticky top-0 z-50 w-full backdrop-blur-md bg-gray-900/80 text-white shadow-lg border-b border-gray-800">
 			<div className="flex relative sm:flex-row flex-col items-center justify-between px-2 py-4 gap-3 sm:gap-0">
 				<div className="flex sm:gap-20 gap-3 justify-center items-center">
-					<div className="absolute left-0 top-[30%]">
+					<Button className="absolute sm:left-3 left-1 sm:top-[30%] top-[55%]">
 						{sideBarToggle ?
-							<PanelRightClose className="cursor-pointer opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
-							: <PanelLeftClose className="cursor-pointer opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
+							<PanelRightClose className="cursor-pointer w-7 h-7 opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
+							: <PanelLeftClose className="cursor-pointer w-7 h-7 opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
 						}
-					</div>
+					</Button>
 					<h1 className="text-lg sm:ml-30 sm:text-3xl font-semibold tracking-tight bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text">
 						<Link href="/">Voting DApp</Link>
 					</h1>
@@ -126,20 +128,20 @@ export default function Header() {
 								<p className="font-medium text-cyan-400">{balance}</p>
 							</span>
 
-							<button
+							<Button
 								onClick={disconnectWallet}
 								className="bg-red-500 cursor-pointer hover:bg-red-600 px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm"
 							>
-								Log Out
-							</button>
+								<IoIosLogOut className="w-4 h-4" />
+							</Button>
 						</>
 					) : (
-						<button
+						<Button
 							onClick={connectWallet}
-							className="bg-linear-to-r cursor-pointer flex justify-center items-center gap-2 bg-[#987eea] hover:bg-[#5021ec] text-white px-5 py-2 rounded-xl font-semibold text-sm transition-all shadow-md"
+							className="bg-linear-to-r cursor-pointer flex justify-center items-center gap-2 bg-[#987eea] hover:bg-[#5021ec] text-white px-5 py-1 rounded-xl font-semibold text-sm transition-all shadow-md"
 						>
 							Connect Wallet <Wallet className="w-5" />
-						</button>
+						</Button>
 					)}
 				</div>
 			</div>
