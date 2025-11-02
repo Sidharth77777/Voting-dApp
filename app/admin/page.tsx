@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useWeb3 } from "../context/Web3Context";
 import { getOwnerFunction } from "../context/contractFunctions";
 import { motion } from "framer-motion";
-import { ShieldCheck, LockKeyhole, Wallet } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import ConnectWalletPage from "../_components/ConnectWallet";
 import AdminPage from "../_components/AdminPage";
 

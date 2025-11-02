@@ -83,10 +83,14 @@ export const changeOwnerFunction = async(contract:ethers.Contract, address:strin
         await tx.wait();
         
         return true;
-    } catch (error:any) {
-        console.error("Error changing owner !", error);
+    } catch (err:any) {
+        console.error("Error changing owner !", err);
 
-        if (error.reason === "Only organizer can do it!") return "Only organizer can do it !";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
 
         return "Something went wrong !";
     }
@@ -115,9 +119,13 @@ export const createGroupFunction = async (contract: ethers.Contract, name: strin
     } catch (err: any) {
         console.error("Error creating group!", err);
 
-        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
-        if (err?.reason === "Start time must be before end time!") return "Start time must be before end time!";
-        if (err?.reason === "End time must be in the future!") return "End time must be in the future!";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Start time must be before end time!")) return "Start time must be before end time!";
+        if (reason?.includes("End time must be in the future!")) return "End time must be in the future!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
 
         return "Something went wrong while creating the group!";
     }
@@ -135,8 +143,14 @@ export const deleteGroupFunction = async(contract:ethers.Contract, groupId:numbe
     } catch (err:any) {
         console.error("Error creating group!", err);
 
-        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
-        if (err?.reason === "No group exists!") return "No group exists!";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Group doesn't exist!")) return "Group doesn't exist!";
+        if (reason?.includes("Candidate does not exist!")) return "Candidate does not exist!";
+        if (reason?.includes("Candidate already in group!")) return "Candidate already in group!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
 
         return "Something went wrong while deleting the group!";
     }
@@ -156,9 +170,13 @@ export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, 
     } catch(err:any) {
         console.error("Error deleting candidate from group!", err);
 
-        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
-        if (err?.reason === "Group does not exist!") return "Group does not exist!";
-        if (err?.reason === "Candidate not in this group!") return "Candidate not in this group!";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Group doesn't exist!")) return "Group doesn't exist!";
+        if (reason?.includes("Candidate does not exist!")) return "Candidate does not exist!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
 
         return "Something went wrong while deleting candidate from the group!";
     }
@@ -178,12 +196,39 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
     } catch(err:any) {
         console.error("Error adding candidate to the group!", err);
 
-        if (err?.reason === "Only organizer can do it!") return "Only organizer can do it!";
-        if (err?.reason === "Group doesn't exist!") return "Group doesn't exist!";
-        if (err?.reason === "Candidate does not exist!") return "Candidate does not exist!";
-        if (err?.reason === "Candidate already in group!") return "Candidate already in group!";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Group doesn't exist!")) return "Group doesn't exist!";
+        if (reason?.includes("Candidate does not exist!")) return "Candidate does not exist!";
+        if (reason?.includes("Candidate already in group!")) return "Candidate already in group!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
 
         return "Something went wrong while adding candidate to the group!";
+    }
+}
+
+export const addVoterByApprovalFunction = async(contract:ethers.Contract, voterAddress:string): Promise<boolean | string> => {
+    // if (!account || !contract) return;
+    if (!voterAddress) return 'No address provided !'
+    if (!ethers.isAddress(voterAddress)) return 'Invalid Ethereum address !';
+
+    try {
+        const tx = await contract.addVoterByApproval(voterAddress);
+        await tx.wait();
+
+        return true;
+    } catch (err:any) {
+        console.error("Error adding candidate to the group!", err);
+
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Already an approved voter!")) return "Already an approved voter!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+        return "Something went wrong while approving !"
     }
 }
 
