@@ -8,8 +8,6 @@ export const pinataCheck = async() => {
     else console.log("PINATA ERROR !!!")
 }
 
-
-
 // WALLET FUNCTIONS
 export const connectWalletFunction = async(): Promise<WalletConnectParamsTypes | void > => {
     if (typeof window === 'undefined' || !window.ethereum) return;
@@ -75,7 +73,7 @@ export const getOwnerFunction = async(contract:ethers.Contract): Promise<string>
     }
 }
 
-export const changeOwnerFunction = async(contract:ethers.Contract, address:string): Promise<string> => {
+export const changeOwnerFunction = async(contract:ethers.Contract, address:string): Promise<boolean | string> => {
     // if(!account || !contract) return;
     if (!address) return 'No address provided !';
 
@@ -87,17 +85,17 @@ export const changeOwnerFunction = async(contract:ethers.Contract, address:strin
         const tx = await contract.changeOwner(address);
         await tx.wait();
         
-        return 'success';
+        return true;
     } catch (error:any) {
         console.error("Error changing owner !", error);
+
         if (error.reason === "Only organizer can do it!") return "Only organizer can do it !";
 
         return "Something went wrong !";
-        // Toast msg frontend
     }
 }
 
-export const createGroupFunction = async (contract: ethers.Contract, name: string, image: string, ipfs: string, requiresRegisteredVoters: boolean, startDate: string, endDate: string): Promise<string> => {
+export const createGroupFunction = async (contract: ethers.Contract, name: string, image: string, ipfs: string, requiresRegisteredVoters: boolean, startDate: string, endDate: string): Promise<boolean | string> => {
     //if(!account || !contract) return;
     // e.g. "2025-10-31T15:00Z"
     if (!name) return "Group name is mandatory!";
@@ -106,22 +104,16 @@ export const createGroupFunction = async (contract: ethers.Contract, name: strin
         const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
         const currentTimestamp = Math.floor(Date.now() / 1000);
 
-        if (isNaN(startTimestamp) || isNaN(endTimestamp)) {
-        return "Invalid date format!";
-        }
+        if (isNaN(startTimestamp) || isNaN(endTimestamp)) return "Invalid date format!";
+ 
+        if (startTimestamp >= endTimestamp) return "Start time must be before end time!";
 
-        if (startTimestamp >= endTimestamp) {
-        return "Start time must be before end time!";
-        }
-
-        if (endTimestamp <= currentTimestamp) {
-        return "End time must be in the future!";
-        }
+        if (endTimestamp <= currentTimestamp) return "End time must be in the future!";
 
         const tx = await contract.createGroup(name, image, ipfs, requiresRegisteredVoters, startTimestamp, endTimestamp);
         await tx.wait();
 
-        return "success";
+        return true;
     } catch (err: any) {
         console.error("Error creating group!", err);
 
@@ -133,7 +125,7 @@ export const createGroupFunction = async (contract: ethers.Contract, name: strin
     }
 };
 
-export const deleteGroupFunction = async(contract:ethers.Contract, groupId:number): Promise<string> => {
+export const deleteGroupFunction = async(contract:ethers.Contract, groupId:number): Promise<boolean | string> => {
     //if(!account || !contract) return;
     if (!groupId) return 'No group ID provided !';
 
@@ -141,7 +133,7 @@ export const deleteGroupFunction = async(contract:ethers.Contract, groupId:numbe
         const tx = await contract.deleteGroup(groupId);
         await tx.wait();
 
-        return 'success'
+        return true;
     } catch (err:any) {
         console.error("Error creating group!", err);
 
@@ -152,7 +144,7 @@ export const deleteGroupFunction = async(contract:ethers.Contract, groupId:numbe
     }
 }
 
-export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<string> => {
+export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<boolean | string> => {
     //if(!account || !contract) return;
     if (!groupId) return 'No group ID provided !';
     if (!candidateAddress) return 'No address provided !'
@@ -162,7 +154,7 @@ export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, 
         const tx = await contract.deleteCandidateFromGroup(groupId, candidateAddress);
         await tx.wait();
 
-        return 'success';
+        return true;
     } catch(err:any) {
         console.error("Error deleting candidate from group!", err);
 
@@ -174,7 +166,7 @@ export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, 
     }
 }
 
-export const addCandidateToGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<string> => {
+export const addCandidateToGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<boolean | string> => {
     //if(!account || !contract) return;
     if (!groupId) return 'No group ID provided !';
     if (!candidateAddress) return 'No address provided !'
@@ -184,7 +176,7 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
         const tx = await contract.addCandidateToGroup(groupId, candidateAddress);
         await tx.wait();
 
-        return 'success';
+        return true;
     } catch(err:any) {
         console.error("Error adding candidate to the group!", err);
 
