@@ -193,7 +193,8 @@ export const applyToBeVoterFunction = async(contract:ethers.Contract, name:strin
     if (!name) return "Voter name is mandatory!";
     if (!address) return 'No address provided !';
     if (!ethers.isAddress(address)) return "Invalid Ethereum Address !";
-    if (age < 18) return "Age must be 18 or above";
+    if (!age || age < 18) return "Age must be between 18 and 120";
+    if (age > 120) return "Invalid Age !";
 
     try {
         const normalizedAddr = ethers.getAddress(address);

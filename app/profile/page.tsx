@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getProfileFunction, pinataCheck } from "../context/contractFunctions";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import ProfileDialog from "../_components/ProfileDialog";
 
 export default function Profile() {
     const { account, contract, profile, setProfile } = useWeb3();
@@ -64,7 +65,9 @@ export default function Profile() {
                     Only <span className="text-blue-400 font-semibold">approved voters</span> can edit or view
                     their profile.
                 </p>
-                <Button className="mt-4 cursor-pointer bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-2 rounded-full font-semibold hover:from-indigo-500 hover:to-blue-500 transition-all duration-300">Apply to be a Voter</Button>
+                
+                <ProfileDialog />
+
             </div>
         );
 

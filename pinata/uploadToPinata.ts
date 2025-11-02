@@ -20,7 +20,7 @@ export const uploadToPinata = async (file: File, category:ImageCategory): Promis
                 const err = await res.json();
                 message = err.error || message;
             } catch (_) {}
-                throw new Error(message);
+                return message;
         }
 
         const data = await res.json();
