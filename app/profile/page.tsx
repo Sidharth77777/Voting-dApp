@@ -5,7 +5,7 @@ import ConnectWalletPage from "../_components/ConnectWallet";
 import { useWeb3 } from "../context/Web3Context";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { getProfileFunction, pinataCheck } from "../context/contractFunctions";
+import { checkIfAlreadyAppliedToBeVoter, getProfileFunction, pinataCheck } from "../context/contractFunctions";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ProfileDialog from "../_components/ProfileDialog";
@@ -13,6 +13,29 @@ import ProfileDialog from "../_components/ProfileDialog";
 export default function Profile() {
     const { account, contract, profile, setProfile } = useWeb3();
     const [loading, setLoading] = useState<boolean>(true);
+    const [alreadyApplied, setAlreadyApplied] = useState<boolean>(false);
+    const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
+
+    const checkIfAlreadyApplied = async(): Promise<void> => {
+        if (!account || !contract) return;
+
+        try {
+            const check = await checkIfAlreadyAppliedToBeVoter(contract, account);
+            if (typeof check === "boolean") {
+                //console.log("Checking.....",check);
+                if (check === true) setAlreadyApplied(true);
+                setCheckingStatus(false);
+            } else {
+                console.log(check);
+            }
+
+        } catch(err:any) {
+            console.error(err);
+        } finally {
+            setCheckingStatus(false);
+        }
+        
+    }
 
     useEffect(() => {
         if (!account || !contract) return;
@@ -21,7 +44,6 @@ export default function Profile() {
             setLoading(true);
             try {
                 const res = await getProfileFunction(contract, account);
-                console.log(res);
 
                 if (typeof res === "string") {
                     setProfile(null);
@@ -42,12 +64,13 @@ export default function Profile() {
         } else {
             fetchProfile();
         }
+        checkIfAlreadyApplied();
         //pinataCheck();
     }, [account, contract]);
 
     if (!account) return <ConnectWalletPage />;
 
-    if (loading)
+    if (loading || checkingStatus)
         return (
             <div className="min-h-screen bg-[#0a0a14] flex flex-col items-center justify-center text-white">
                 <Loader2 className="animate-spin w-14 h-14 text-blue-500 mb-4" />
@@ -56,8 +79,20 @@ export default function Profile() {
                 </p>
             </div>
         );
+    
+    if (alreadyApplied && !profile?.exists)
+        return (
+            <div className="p-6 min-h-screen flex justify-center items-center flex-col rounded-2xl bg-gray-900 border border-gray-800 text-center shadow-md">
+                <h2 className="text-xl font-semibold bg-linear-to-r from-violet-400 to-blue-500 bg-clip-text text-transparent mb-2">
+                    You've Already Applied 🎉
+                </h2>
+                <p className="text-gray-400 text-sm">
+                    Your application is currently under review. You'll be notified once it's approved.
+                </p>
+            </div>
+        );
 
-    if (!profile?.exists)
+    if (!profile?.exists && !alreadyApplied)
         return (
             <div className="min-h-screen bg-[#0a0a14] flex flex-col items-center justify-center text-white text-center p-10">
                 <h2 className="text-2xl font-semibold mb-2">Access Restricted</h2>
@@ -70,6 +105,7 @@ export default function Profile() {
 
             </div>
         );
+    
 
     return (
         <motion.div

@@ -240,6 +240,21 @@ export const getProfileFunction = async(contract:ethers.Contract, account:string
     }
 }
 
+export const checkIfAlreadyAppliedToBeVoter = async(contract:ethers.Contract, account:string): Promise<boolean | void> => {
+    // if (!account || !contract) return;
+    if (!account || !ethers.isAddress(account)) return;
+
+    try {
+        const checker = await contract.votersToBeAllowed(account);
+
+        if (checker && checker.name && checker.voterAddress === ethers.getAddress(account)) return true;
+        else return false;
+    } catch (err:any) {
+        console.error(err);
+        return;
+    }
+}
+
 export const getCandidatesLengthFunction = async(contract:ethers.Contract): Promise<number> => {
     //if(!account || !contract) return;
 
