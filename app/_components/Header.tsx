@@ -102,12 +102,12 @@ export default function Header() {
 		<header className="sticky top-0 z-50 w-full backdrop-blur-md bg-gray-900/80 text-white shadow-lg border-b border-gray-800">
 			<div className="flex relative sm:flex-row flex-col items-center justify-between px-2 py-4 gap-3 sm:gap-0">
 				<div className="flex sm:gap-20 gap-3 justify-center items-center">
-					<Button className="absolute sm:left-3 left-1 sm:top-[30%] top-[55%]">
+					<div className="absolute sm:left-3 left-1 sm:top-[30%] top-[58%]">
 						{sideBarToggle ?
-							<PanelRightClose className="cursor-pointer w-7 h-7 opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
-							: <PanelLeftClose className="cursor-pointer w-7 h-7 opacity-80" onClick={() => setSideBarToggle(!sideBarToggle)} />
+							<PanelRightClose className="cursor-pointer w-6 h-6 opacity-80" onClick={() => setSideBarToggle(false)} />
+							: <PanelLeftClose className="cursor-pointer w-6 h-6 opacity-80" onClick={() => setSideBarToggle(true)} />
 						}
-					</Button>
+					</div>
 					<h1 className="text-lg sm:ml-30 sm:text-3xl font-semibold tracking-tight bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text">
 						<Link href="/">Voting DApp</Link>
 					</h1>

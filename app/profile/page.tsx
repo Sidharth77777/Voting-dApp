@@ -82,9 +82,9 @@ export default function Profile() {
     
     if (alreadyApplied && !profile?.exists)
         return (
-            <div className="p-6 min-h-screen flex justify-center items-center flex-col rounded-2xl bg-gray-900 border border-gray-800 text-center shadow-md">
+            <div className="p-6 min-h-screen flex justify-center items-center flex-col rounded-2xl bg-[#10101b] border border-gray-800 text-center shadow-md">
                 <h2 className="text-xl font-semibold bg-linear-to-r from-violet-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                    You've Already Applied 🎉
+                    You've Already Applied to be a voter 🎉
                 </h2>
                 <p className="text-gray-400 text-sm">
                     Your application is currently under review. You'll be notified once it's approved.
