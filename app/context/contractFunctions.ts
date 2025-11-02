@@ -79,7 +79,8 @@ export const changeOwnerFunction = async(contract:ethers.Contract, address:strin
     if (!ethers.isAddress(address)) return 'Invalid Ethereum address !'
 
     try{
-        const tx = await contract.changeOwner(address);
+        const normalisedAddr = ethers.getAddress(address);
+        const tx = await contract.changeOwner(normalisedAddr);
         await tx.wait();
         
         return true;
@@ -163,7 +164,9 @@ export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, 
     if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
 
     try{
-        const tx = await contract.deleteCandidateFromGroup(groupId, candidateAddress);
+        const normalisedAddr = ethers.getAddress(candidateAddress);
+
+        const tx = await contract.deleteCandidateFromGroup(groupId, normalisedAddr);
         await tx.wait();
 
         return true;
@@ -182,6 +185,34 @@ export const deleteCandidateFromGroupFunction = async(contract:ethers.Contract, 
     }
 }
 
+export const createCandidateFunction = async(contract:ethers.Contract, name:string, address:string, age:number, image:string, ipfs:string): Promise<boolean | string> => {
+    // if (!account || !contract) return;
+    if (!name) return "Voter name is mandatory!";
+    if (!address) return 'No address provided !';
+    if (!ethers.isAddress(address)) return "Invalid Ethereum Address !";
+    if (!age || age < 18) return "Age must be between 18 and 120";
+    if (age > 120) return "Invalid Age !";
+
+    try{
+        const normalisedAddr = ethers.getAddress(address);
+        const tx = await contract.createCandidate(name, normalisedAddr, age, image, ipfs);
+        await tx.wait();
+
+        return true;
+    } catch (err:any) {
+        console.error("Error creating candidate !", err);
+
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Candidate already exists!")) return "Candidate already exists!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+
+        return "Something went wrong while adding candidate to the group!";
+    }
+}
+
 export const addCandidateToGroupFunction = async(contract:ethers.Contract, groupId:number, candidateAddress:string): Promise<boolean | string> => {
     //if(!account || !contract) return;
     if (!groupId) return 'No group ID provided !';
@@ -189,7 +220,8 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
     if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
 
     try {
-        const tx = await contract.addCandidateToGroup(groupId, candidateAddress);
+        const normalisedAddr = ethers.getAddress(candidateAddress);
+        const tx = await contract.addCandidateToGroup(groupId, normalisedAddr);
         await tx.wait();
 
         return true;
@@ -215,7 +247,9 @@ export const addVoterByApprovalFunction = async(contract:ethers.Contract, voterA
     if (!ethers.isAddress(voterAddress)) return 'Invalid Ethereum address !';
 
     try {
-        const tx = await contract.addVoterByApproval(voterAddress);
+        const normalisedAddr = ethers.getAddress(voterAddress);
+
+        const tx = await contract.addVoterByApproval(normalisedAddr);
         await tx.wait();
 
         return true;
@@ -232,6 +266,31 @@ export const addVoterByApprovalFunction = async(contract:ethers.Contract, voterA
     }
 }
 
+export const addCandidateByApprovalFunction = async(contract:ethers.Contract, candidateAddress:string): Promise<boolean | string> => {
+    // if (!account || !contract) return;
+    if (!candidateAddress) return 'No address provided !'
+    if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
+
+    try {
+        const normalisedAddr = ethers.getAddress(candidateAddress);
+
+        const tx = await contract.addCandidateByApproval(normalisedAddr);
+        await tx.wait();
+
+        return true;
+    } catch (err:any) {
+        console.error("Error adding candidate to the group!", err);
+
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Only organizer can do it!")) return "Only organizer can do it!";
+        if (reason?.includes("Already an approved candidate!")) return "Already an approved candidate!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+        return "Something went wrong while approving !"
+    }
+}
+
 // APPLY FUNCTIONS
 export const applyToBeVoterFunction = async(contract:ethers.Contract, name:string, address:string, age:number, image:string, ipfs:string): Promise<boolean | string> => {
     // if (!account || !contract) return;
@@ -242,8 +301,8 @@ export const applyToBeVoterFunction = async(contract:ethers.Contract, name:strin
     if (age > 120) return "Invalid Age !";
 
     try {
-        const normalizedAddr = ethers.getAddress(address);
-        const tx = await contract.applyToBeVoter(name, normalizedAddr, age, image, ipfs);
+        const normalisedAddr = ethers.getAddress(address);
+        const tx = await contract.applyToBeVoter(name, normalisedAddr, age, image, ipfs);
         await tx.wait();
 
         return true;
@@ -261,6 +320,34 @@ export const applyToBeVoterFunction = async(contract:ethers.Contract, name:strin
     }
 }
 
+export const applyToBeCandidateFunction = async(contract:ethers.Contract, name:string, address:string, age:number, image:string, ipfs:string): Promise<boolean | string> => {
+    // if (!account || !contract) return;
+    if (!name) return "Voter name is mandatory!";
+    if (!address) return 'No address provided !';
+    if (!ethers.isAddress(address)) return "Invalid Ethereum Address !";
+    if (!age || age < 18) return "Age must be between 18 and 120";
+    if (age > 120) return "Invalid Age !";
+
+    try {
+        const normalisedAddr = ethers.getAddress(address);
+        const tx = await contract.applyToBeCandidate(name, normalisedAddr, age, image, ipfs);
+        await tx.wait();
+
+        return true;
+    } catch (err:any) {
+        console.error('Error while applying',err)
+
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("Already an approved candidate")) return "Already an approved candidate!";
+        if (reason?.includes("Already applied")) return "Already applied!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+
+        return "Something went wrong while applying!";
+    }
+}
+
 // GETTER FUNCTIONS
 export const getProfileFunction = async(contract:ethers.Contract, account:string): Promise<string | VoterDataType> => {
     // if (!account || !contract) return;
@@ -269,7 +356,7 @@ export const getProfileFunction = async(contract:ethers.Contract, account:string
         const Voter: VoterDataType = {
             id: Number(profile[0]),
             name: profile[1],
-            voterAddress: profile[2],
+            voterAddress: ethers.getAddress(profile[2]),
             age: Number(profile[3]),
             image: profile[4],
             ipfs: profile[5],
@@ -290,7 +377,9 @@ export const checkIfAlreadyAppliedToBeVoter = async(contract:ethers.Contract, ac
     if (!account || !ethers.isAddress(account)) return;
 
     try {
-        const checker = await contract.votersToBeAllowed(account);
+        const normalisedAddr = ethers.getAddress(account);
+
+        const checker = await contract.votersToBeAllowed(normalisedAddr);
 
         if (checker && checker.name && checker.voterAddress === ethers.getAddress(account)) return true;
         else return false;
@@ -321,7 +410,9 @@ export const getCandidateDataFunction = async(contract:ethers.Contract, candidat
     if (!ethers.isAddress(candidateAddress)) return 'Invalid Ethereum address !';
 
     try {
-        const data = await contract.getCandidateData(candidateAddress);
+        const normalisedAddr = ethers.getAddress(candidateAddress);
+
+        const data = await contract.getCandidateData(normalisedAddr);
         const candidateData: CandidateDataType = {
             id: Number(data.id),
             name: data.name,
@@ -361,11 +452,13 @@ export const getVoterDataFunction = async(contract:ethers.Contract, address:stri
     if (!ethers.isAddress(address)) return 'Invalid Ethereum address !';
 
     try {
-        const data = await contract.getVoterData(address);
+        const normalisedAddr = ethers.getAddress(address);
+
+        const data = await contract.getVoterData(normalisedAddr);
         const voterData: VoterDataType = {
             id: data.id,
             name: data.name,
-            voterAddress: data.voterAddress,
+            voterAddress: ethers.getAddress(data.voterAddress),
             age: data.age,
             image: data.image,
             ipfs: data.string,
