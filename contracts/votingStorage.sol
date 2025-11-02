@@ -71,5 +71,6 @@ contract VotingStorage {
         bool exists;
         uint startTime;
         uint endTime;
+        string description;
     }
 }

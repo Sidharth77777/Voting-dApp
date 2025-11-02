@@ -16,7 +16,7 @@ contract VotingOrganizer is VotingStorage, VotingModifiers {
     }
 
     /// @dev Create a new group with start and end times
-    function createGroup(string calldata _name, string calldata _image, string calldata _ipfs, bool _requiresRegisteredVoters, uint _startTime, uint _endTime) external onlyOwner {
+    function createGroup(string calldata _name, string calldata _image, string calldata _ipfs, bool _requiresRegisteredVoters, uint _startTime, uint _endTime, string calldata _description) external onlyOwner {
         require(_startTime < _endTime, "Start time must be before end time!");
         require(_endTime > block.timestamp, "End time must be in the future!");
 
@@ -30,6 +30,7 @@ contract VotingOrganizer is VotingStorage, VotingModifiers {
         newGroup.exists = true;
         newGroup.startTime = _startTime;
         newGroup.endTime = _endTime;
+        newGroup.description = _description;
 
         emit GroupCreated(groupId, _name, _requiresRegisteredVoters, _startTime, _endTime);
     }

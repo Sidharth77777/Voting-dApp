@@ -130,11 +130,11 @@ contract Voting is Initializable, VotingStorage, VotingModifiers, VotingGetters,
 
     /// @dev Cast vote for a candidate in a group
     function vote(uint _groupId, address _candidateAddress) external onlyDuringVoting(_groupId) {
-        require(groups[_groupId].candidateExists[_candidateAddress], "Candidate not in this group!");
+        //require(groups[_groupId].candidateExists[_candidateAddress], "Candidate not in this group!");
         require(!hasVotedInGroup[msg.sender][_groupId], "Already voted in this group!");
 
         Candidate storage candidate = candidates[_candidateAddress];
-        require(msg.sender != _candidateAddress, "You cannot vote for yourself!");
+        //require(msg.sender != _candidateAddress, "You cannot vote for yourself!");
 
         // If group requires registered voters
         if (groups[_groupId].requiresRegisteredVoters) {
