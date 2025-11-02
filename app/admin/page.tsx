@@ -6,6 +6,7 @@ import { getOwnerFunction } from "../context/contractFunctions";
 import { motion } from "framer-motion";
 import { ShieldCheck, LockKeyhole, Wallet } from "lucide-react";
 import ConnectWalletPage from "../_components/ConnectWallet";
+import AdminPage from "../_components/AdminPage";
 
 export default function Admin() {
 	const { account, contract } = useWeb3();
@@ -34,24 +35,8 @@ export default function Admin() {
 	if (!account)
 		return <ConnectWalletPage />
 
-	if (account?.toLowerCase() === owner?.toLowerCase())
-		return (
-			<motion.div
-				variants={fade}
-				initial="hidden"
-				animate="visible"
-				className="flex min-h-screen flex-col items-center justify-center h-[80vh] text-center"
-			>
-				<ShieldCheck className="w-20 h-20 text-green-500 mb-4" />
-				<h1 className="text-3xl font-bold text-green-400 mb-2">
-					Welcome, Admin 👑
-				</h1>
-				<p className="text-gray-400 max-w-md">
-					You have full access to manage voting, verify candidates, and monitor
-					blockchain activity.
-				</p>
-			</motion.div>
-		);
+	if (account?.toLowerCase() === owner?.toLowerCase()) 
+		return <AdminPage />
 
 	return (
 		<motion.div
