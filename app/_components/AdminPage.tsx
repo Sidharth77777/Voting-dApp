@@ -7,8 +7,6 @@ import {
     Users,
     UserPlus,
     Check,
-    Upload,
-    Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CreatePoll from "./CreatePoll";
@@ -214,24 +212,24 @@ export default function AdminPage() {
                         <div className="bg-[#0f1116] border border-[#1d1f2b] rounded-2xl p-4 shadow-sm">
                             <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
                             <div className="flex flex-col gap-2">
-                                <button
+                                <Button
                                     className="w-full px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition disabled:opacity-60"
                                     disabled
                                 >
                                     Refresh data
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     className="w-full px-3 py-2 rounded-lg bg-transparent border border-gray-700 text-gray-300"
                                     disabled
                                 >
                                     Export stats
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     className="w-full px-3 py-2 rounded-lg bg-transparent border border-gray-700 text-gray-300"
                                     disabled
                                 >
                                     View blockchain logs
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -285,12 +283,12 @@ const Section: React.FC<{
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <button
-                                className="px-3 py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60"
-                                disabled
+                            <Button
+                                className="px-3 cursor-pointer py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60"
+                                
                             >
                                 Accept
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 ))}

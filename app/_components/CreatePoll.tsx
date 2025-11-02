@@ -16,7 +16,7 @@ export default function CreatePoll() {
                         Create a Poll
                     </DialogTitle>
                     <DialogDescription className="text-gray-400 text-sm">
-                        Fill out your information below to apply as a registered voter.<br />
+                        Fill out the informations below for creating a poll group.<br />
                     </DialogDescription>
                 </DialogHeader>
 
