@@ -11,14 +11,13 @@ import { useEffect } from "react";
 import Image from "next/image";
 import ETH from "./../images/ethereum-original.svg";
 import Link from "next/link";
-import { useToast } from "./Toast";
+import toast from 'react-hot-toast';
 import { PanelLeftClose, PanelRightClose, Wallet } from "lucide-react";
 import { IoIosLogOut } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
 	const { account, contract, provider, balance, sideBarToggle, setBalance, setAccount, setContract, setProvider, setSideBarToggle, profile, setProfile }: ContextType = useWeb3();
-	let { showToast } = useToast();
 
 	const fetchProfile = async () => {
 		if (!account || !contract) return;
@@ -41,21 +40,25 @@ export default function Header() {
 			setAccount(walletConnectParams.account);
 			setContract(walletConnectParams.contract);
 			setProvider(walletConnectParams.provider);
-			showToast("Connected Wallet Successfully !");
+			toast.success("Connected Wallet Successfully")
 		} else {
-			showToast(
-				<div className="flex items-center justify-between gap-2">
-					<span>Install MetaMask first!</span>
-					<a
-						href="https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="bg-green-400 hover:bg-green-500 text-black px-2 py-1 rounded text-sm font-medium transition"
+			toast((t) => (
+				<span>
+					Install<b> Metmask</b> first! 
+					<button
+					className="bg-green-400 hover:bg-green-500 cursor-pointer text-black px-2 py-1 rounded text-sm font-medium transition ml-2"
+					onClick={() => {
+						window.open(
+						"https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn",
+						"_blank"
+						);
+						toast.dismiss(t.id);
+					}}
 					>
-						Install
-					</a>
-				</div>
-			);
+      				Install
+    				</button>
+				</span>
+			));
 		}
 		return;
 	};

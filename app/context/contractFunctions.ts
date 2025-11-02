@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
 import { WalletConnectParamsTypes, CandidateDataType, VoterDataType } from "@/types/types";
-import { pinata } from "@/config/pinataConfig";
+import { pinata } from '@/pinata/pinataConfig'
 
 export const pinataCheck = async() => {
     if (pinata) console.log('pinata connection successfull')
@@ -76,12 +76,9 @@ export const getOwnerFunction = async(contract:ethers.Contract): Promise<string>
 export const changeOwnerFunction = async(contract:ethers.Contract, address:string): Promise<boolean | string> => {
     // if(!account || !contract) return;
     if (!address) return 'No address provided !';
+    if (!ethers.isAddress(address)) return 'Invalid Ethereum address !'
 
     try{
-        if (!ethers.isAddress(address)) {
-            return 'Invalid Ethereum address !';
-        }
-
         const tx = await contract.changeOwner(address);
         await tx.wait();
         
@@ -99,17 +96,18 @@ export const createGroupFunction = async (contract: ethers.Contract, name: strin
     //if(!account || !contract) return;
     // e.g. "2025-10-31T15:00Z"
     if (!name) return "Group name is mandatory!";
-    try {
-        const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
-        const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
-        const currentTimestamp = Math.floor(Date.now() / 1000);
 
-        if (isNaN(startTimestamp) || isNaN(endTimestamp)) return "Invalid date format!";
+    const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
+    const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    if (isNaN(startTimestamp) || isNaN(endTimestamp)) return "Invalid date format!";
  
-        if (startTimestamp >= endTimestamp) return "Start time must be before end time!";
+    if (startTimestamp >= endTimestamp) return "Start time must be before end time!";
 
-        if (endTimestamp <= currentTimestamp) return "End time must be in the future!";
+    if (endTimestamp <= currentTimestamp) return "End time must be in the future!";
 
+    try {
         const tx = await contract.createGroup(name, image, ipfs, requiresRegisteredVoters, startTimestamp, endTimestamp);
         await tx.wait();
 
@@ -192,16 +190,28 @@ export const addCandidateToGroupFunction = async(contract:ethers.Contract, group
 // APPLY FUNCTIONS
 export const applyToBeVoterFunction = async(contract:ethers.Contract, name:string, address:string, age:number, image:string, ipfs:string): Promise<boolean | string> => {
     // if (!account || !contract) return;
+    if (!name) return "Voter name is mandatory!";
+    if (!address) return 'No address provided !';
+    if (!ethers.isAddress(address)) return "Invalid Ethereum Address !";
+    if (age < 18) return "Age must be 18 or above";
+
     try {
+        const normalizedAddr = ethers.getAddress(address);
+        const tx = await contract.applyToBeVoter(name, normalizedAddr, age, image, ipfs);
+        await tx.wait();
 
         return true;
     } catch (err:any) {
         console.error('Error while applying',err)
 
-        if (err?.reason === "Already an approved voter!") return "Already an approved voter!";
-        if (err?.reason === "Already applied!") return "Already applied!";
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
 
-        return "Something went wrong while applying !";
+        if (reason?.includes("Already an approved voter")) return "Already an approved voter!";
+        if (reason?.includes("Already applied")) return "Already applied!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+
+        return "Something went wrong while applying!";
     }
 }
 

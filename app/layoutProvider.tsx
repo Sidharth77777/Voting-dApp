@@ -2,7 +2,7 @@
 
 import Header from "./_components/Header";
 import SideBar from "./_components/SideBar";
-import { ToastProvider } from "./_components/Toast";
+import { Toaster } from 'react-hot-toast';
 import { useState, useEffect } from "react";
 import { useWeb3 } from "./context/Web3Context";
 import { motion } from "framer-motion";
@@ -31,9 +31,8 @@ export default function LayoutProvider({children}: {children: React.ReactNode}) 
                     transition={{ stiffness: 80, damping: 20, duration: 0.1,}}
                     className={`${isMobile ? "" : "mx-12"} transition-all duration-300`}
                 >
-                <ToastProvider>
+                    <Toaster />
                     {children}
-                </ToastProvider>
                 
                 <Footer />
             </motion.div>

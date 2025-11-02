@@ -3,16 +3,15 @@
 import { useWeb3 } from "../context/Web3Context";
 import { WalletConnectParamsTypes } from "@/types/types";
 import { connectWalletFunction } from "../context/contractFunctions";
-import { useToast } from "./Toast";
 import { Button } from "@/components/ui/button";
 import { Wallet } from "lucide-react";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export default function HeroSection() {
   const { account, setAccount, setContract, setProvider } = useWeb3();
   const router: AppRouterInstance = useRouter();
-  let { showToast } = useToast();
 
   const connectWallet = async (): Promise<void> => {
     const walletConnectParams: WalletConnectParamsTypes | void = await connectWalletFunction();
@@ -20,9 +19,9 @@ export default function HeroSection() {
       setAccount(walletConnectParams.account);
       setContract(walletConnectParams.contract);
       setProvider(walletConnectParams.provider);
-      showToast("Connected Wallet Successfully !");
+      toast.success("Connected Wallet Successfully !");
     } else {
-      showToast(
+      toast(
         <div className="flex items-center justify-between gap-2">
           <span>Install MetaMask first!</span>
           <a

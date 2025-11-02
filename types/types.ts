@@ -69,3 +69,10 @@ export interface ContextType extends WithSideBarType {
     profile: VoterDataType | null;
     setProfile: (profile: VoterDataType | null) => void;
 }
+
+export type ImageCategory = "voter" | "candidate" | "group";
+
+export interface UploadedImageType {
+    cid: string;
+    url: string;
+}

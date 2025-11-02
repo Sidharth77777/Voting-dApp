@@ -6,13 +6,11 @@ import { useWeb3 } from "../context/Web3Context";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { getProfileFunction, pinataCheck } from "../context/contractFunctions";
-import { VoterDataType } from "@/types/types";
-import { useToast } from "../_components/Toast";
+import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 
 export default function Profile() {
     const { account, contract, profile, setProfile } = useWeb3();
-    const { showToast } = useToast();
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -26,13 +24,13 @@ export default function Profile() {
 
                 if (typeof res === "string") {
                     setProfile(null);
-                    showToast("Error fetching profile");
+                    toast.error("Error fetching profile");
                     return;
                 }
                 setProfile(res);
             } catch (err: any) {
                 console.error(err);
-                showToast("Error fetching profile");
+                toast.error("Error fetching profile");
             } finally {
                 setLoading(false);
             }
