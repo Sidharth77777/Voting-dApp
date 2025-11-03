@@ -76,3 +76,19 @@ export interface UploadedImageType {
     cid: string;
     url: string;
 }
+
+export interface AdminPageProps {
+    owner: string;
+}
+
+export interface VotersToBeApprovedType{
+    name: string;
+    voterAddress: string;
+    image?: string;
+}
+
+export interface CandidatesToBeApprovedType{
+    name: string;
+    candidateAddress: string;
+    image?: string;
+}

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
-import { WalletConnectParamsTypes, CandidateDataType, VoterDataType } from "@/types/types";
+import { WalletConnectParamsTypes, CandidateDataType, VoterDataType, VotersToBeApprovedType, CandidatesToBeApprovedType } from "@/types/types";
 import { pinata } from '@/pinata/pinataConfig'
 
 export const pinataCheck = async() => {
@@ -381,7 +381,7 @@ export const checkIfAlreadyAppliedToBeVoter = async(contract:ethers.Contract, ac
 
         const checker = await contract.votersToBeAllowed(normalisedAddr);
 
-        if (checker && checker.name && checker.voterAddress === ethers.getAddress(account)) return true;
+        if (checker && checker.voterAddress === ethers.getAddress(account)) return true;
         else return false;
     } catch (err:any) {
         console.error(err);
@@ -389,7 +389,7 @@ export const checkIfAlreadyAppliedToBeVoter = async(contract:ethers.Contract, ac
     }
 }
 
-export const getCandidatesLengthFunction = async(contract:ethers.Contract): Promise<number> => {
+export const getCandidatesLengthFunction = async(contract:ethers.Contract): Promise<number | string> => {
     //if(!account || !contract) return;
 
     try {
@@ -400,7 +400,7 @@ export const getCandidatesLengthFunction = async(contract:ethers.Contract): Prom
     } catch(err:any) {
         console.error("Error getting length of candidates !", err);
 
-        return 0;
+        return "Error getting length of candidates !";
     }
 }
 
@@ -431,8 +431,8 @@ export const getCandidateDataFunction = async(contract:ethers.Contract, candidat
     }
 }
 
-export const getVotersLengthFunction = async(contract:ethers.Contract): Promise<number> => {
-    //if (!account || !contract) return;
+export const getVotersLengthFunction = async(contract:ethers.Contract): Promise<number | string> => {
+    //if (!owner || !contract) return;
 
     try {
         const votersLengthInWei: ethers.BigNumberish = await contract.getVotersLength();
@@ -440,9 +440,80 @@ export const getVotersLengthFunction = async(contract:ethers.Contract): Promise<
 
         return votersLength;
     } catch(err:any) {
-        console.error("Error getting voters length !");
+        console.error("Error getting voters length !",err);
 
-        return 0;
+        return "Error getting voters length !";
+    }
+}
+
+export const getTotalPollsLengthFunction = async(contract:ethers.Contract): Promise<number | string> => {
+    //if (!owner || !contract) return;
+
+    try {
+        const totalGroupId: ethers.BigNumberish = await contract.groupId();
+        const totalPolls: number = Number(totalGroupId);
+
+        return totalPolls;
+    } catch(err:any) {
+        console.error("Error getting total polls !",err);
+
+        return "Error getting total polls length !";
+    }
+}
+
+// need to optimise
+export const getCompletedPollsLengthFunction = async(contract:ethers.Contract): Promise<number | string> => {
+    //if (!owner || !contract) return;
+
+    try {
+        const totalGroupID: ethers.BigNumberish = await contract.groupId();
+        const totalGroups: number = Number(totalGroupID);
+        let completedPolls: number = 0;
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        for (let i = 0; i <= totalGroups; i++) {
+            const group = await contract.groups(i);
+            const endTime = Number(group.endTime);
+
+            if (endTime > 0 && endTime < currentTime) {
+                completedPolls++
+            }
+        }
+
+        return completedPolls;
+    } catch(err:any) {
+        console.error("Error getting completed polls !",err);
+
+        return "Error getting completed polls length !";
+    }
+}
+// this only
+
+export const getTotalVotersToBeApprovedFunction = async(contract:ethers.Contract): Promise<number | string> => {
+    // if(!owner || !contract) return;
+    try {
+        const lengthInWei: ethers.BigNumberish = await contract.votersToBeAllowedId();
+        const length: number = Number(lengthInWei);
+
+        return length;
+    } catch (err:any) {
+        console.error("Error fetching approvable voters length !",err)
+
+        return "Error fetching approvable voters length !";
+    }
+}
+
+export const getTotalCandidatesToBeApprovedFunction = async(contract:ethers.Contract): Promise<number | string> => {
+    // if(!owner || !contract) return;
+    try {
+        const lengthInWei: ethers.BigNumberish = await contract.candidatesToBeAllowedId();
+        const length: number = Number(lengthInWei);
+
+        return length;
+    } catch (err:any) {
+        console.error("Error fetching approvable candidates length !",err)
+
+        return "Error fetching approvable candidates length !";
     }
 }
 
@@ -470,5 +541,59 @@ export const getVoterDataFunction = async(contract:ethers.Contract, address:stri
     } catch(err:any) {
         console.error("Error getting voter data !",err);
         return 'Error getting voter data !'
+    }
+}
+
+export const getVotersToBeAllowedFunction = async(contract:ethers.Contract): Promise<VotersToBeApprovedType[] | string> => {
+    // if(!owner || !contract) return;
+    try {
+        const lengthinWei: ethers.BigNumberish = await contract.getVotersToBeAllowedListLength();
+        const length = Number(lengthinWei);
+        
+        const pendingVoters: VoterDataType[] = [];
+        for (let i = 0; i < length; i++){
+            const voter: string = await contract.votersToBeAllowedList(i);
+            const voterToBeAllowed: VoterDataType = await contract.votersToBeAllowed(ethers.getAddress(voter));
+            pendingVoters.push(voterToBeAllowed);
+        }
+
+        const formattedVoters: VotersToBeApprovedType[] = pendingVoters.map((voter) => ({
+            name: voter.name,
+            voterAddress: String(voter.voterAddress),
+            image: voter.image,
+        }))
+
+        return formattedVoters;
+    } catch (err:any) {
+        console.error("Error fetching approvable voters !",err)
+
+        return "Error fetching approvable voters !";
+    }
+}
+
+export const getCandidatesToBeAllowedFunction = async(contract:ethers.Contract): Promise<CandidatesToBeApprovedType[] | string> => {
+    // if(!owner || !contract) return;
+    try {
+        const lengthinWei: ethers.BigNumberish = await contract.getCandidatesToBeAllowedListLength();
+        const length = Number(lengthinWei);
+        
+        const pendingCandidates: CandidatesToBeApprovedType[] = [];
+        for (let i = 0; i < length; i++){
+            const candidate: string = await contract.candidatesToBeAllowedList(i);
+            const candidateToBeAllowed: CandidateDataType = await contract.candidatesToBeAllowed(ethers.getAddress(candidate));
+            pendingCandidates.push(candidateToBeAllowed);
+        }
+
+        const formattedCandidate: CandidatesToBeApprovedType[] = pendingCandidates.map((candidate) => ({
+            name: candidate.name,
+            candidateAddress: String(candidate.candidateAddress),
+            image: candidate.image,
+        }))
+
+        return formattedCandidate;
+    } catch (err:any) {
+        console.error("Error fetching approvable candidates !",err)
+
+        return "Error fetching approvable candidates !";
     }
 }

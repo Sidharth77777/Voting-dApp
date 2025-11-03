@@ -25,6 +25,14 @@ contract VotingGetters is VotingStorage, VotingModifiers {
         return voters[_addr];
     }
 
+    function getVotersToBeAllowedListLength() public view returns (uint256) {
+        return votersToBeAllowedList.length;
+    }
+
+    function getCandidatesToBeAllowedListLength() public view returns (uint256) {
+        return candidatesToBeAllowedList.length;
+    }
+
     // ============================
     // Image / Metadata Updates
     // ============================

@@ -10,6 +10,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CreatePoll from "./CreatePoll";
+import { useEffect, useState } from "react";
+import { useWeb3 } from "../context/Web3Context";
+import { AdminPageProps, CandidatesToBeApprovedType, VotersToBeApprovedType } from "@/types/types";
+import { getCandidatesLengthFunction, getCandidatesToBeAllowedFunction, getCompletedPollsLengthFunction, getTotalCandidatesToBeApprovedFunction, getTotalPollsLengthFunction, getTotalVotersToBeApprovedFunction, getVotersLengthFunction, getVotersToBeAllowedFunction } from "../context/contractFunctions";
 
 const StatCard: React.FC<{ title: string; value: number; icon?: React.ReactNode }> = ({
     title,
@@ -64,31 +68,86 @@ const mockPolls = [
         startDate: "2025-11-20",
         endDate: "2025-11-25",
         status: "Upcoming",
-    },{
-        id: 3,
+    }, {
+        id: 4,
         title: "New Policy Amendment",
         description: "Vote for or against the new policy changes.",
         startDate: "2025-11-20",
         endDate: "2025-11-25",
         status: "Upcoming",
-    },{
-        id: 3,
+    }, {
+        id: 5,
         title: "New Policy Amendment",
         description: "Vote for or against the new policy changes.",
         startDate: "2025-11-20",
         endDate: "2025-11-25",
         status: "Upcoming",
     },
-    
+
 ];
 
-export default function AdminPage() {
-    const stats = {
-        totalPolls: mockPolls.length,
-        totalVoters: 412,
-        totalCandidates: 28,
-        completedPolls: mockPolls.filter((p) => p.status === "Completed").length,
-    };
+export default function AdminPage({ owner }: AdminPageProps) {
+    const { account, contract } = useWeb3();
+    const [loadingAll, setLoadingAll] = useState<boolean>(false);
+    const [totalVoters, setTotalVoters] = useState<number>(0);
+    const [totalCandidates, setTotalCandidates] = useState<number>(0);
+    const [totalPolls, setTotalPolls] = useState<number>(0);
+    const [totalCompletedPolls, setTotalCompletedPolls] = useState<number>(0);
+    const [totalApprovableVoters, setTotalApprovableVoters] = useState<number>(0);
+    const [totalApprovableCandidates, setTotalApprovableCandidates] = useState<number>(0);
+    const [totalPendingVoters, setTotalPendingVoters] = useState<VotersToBeApprovedType[]>([]);
+    const [totalPendingCandidates, setTotalPendingCandidates] = useState<CandidatesToBeApprovedType[]>([]);
+
+    const fetchAll = async () => {
+        if (!account || !contract) return;
+        try {
+            setLoadingAll(true);
+            const [
+                votersLength,
+                candidatesLength,
+                totalPolls,
+                completedPolls,
+                approvableVoters,
+                approvableCandidates,
+                pendingVoters,
+                pendingCandidates,
+            ] = await Promise.all([
+                getVotersLengthFunction(contract),
+                getCandidatesLengthFunction(contract),
+                getTotalPollsLengthFunction(contract),
+                getCompletedPollsLengthFunction(contract),
+                getTotalVotersToBeApprovedFunction(contract),
+                getTotalCandidatesToBeApprovedFunction(contract),
+                getVotersToBeAllowedFunction(contract),
+                getCandidatesToBeAllowedFunction(contract)
+            ]);
+
+            if (typeof votersLength !== "string") setTotalVoters(votersLength);
+            if (typeof candidatesLength !== "string") setTotalCandidates(candidatesLength);
+            if (typeof totalPolls !== "string") setTotalPolls(totalPolls);
+            if (typeof completedPolls !== "string") setTotalCompletedPolls(completedPolls);
+            if (typeof approvableVoters !== "string") setTotalApprovableVoters(approvableVoters);
+            if (typeof approvableCandidates !== "string") setTotalApprovableCandidates(approvableCandidates);
+            if (typeof pendingVoters !== "string") setTotalPendingVoters(pendingVoters);
+            if (typeof pendingCandidates !== "string") setTotalPendingCandidates(pendingCandidates);
+            setLoadingAll(false);
+        } catch (err) {
+            console.error("Error fetching dashboard stats:", err);
+            setLoadingAll(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!owner || !contract) return;
+        fetchAll();
+    }, [owner, contract]);
+
+    if (loadingAll) return (
+        <div className="flex min-h-screen flex-col items-center justify-center h-40 space-y-3">
+            <div className="w-10 h-10 border-4 border-gray-700 border-t-[#1a1a2e] rounded-full animate-spin"></div>
+            <p className="text-gray-400 text-sm">Loading dashboard data...</p>
+        </div>
+    )
 
     return (
         <div className="min-h-screen w-full overflow-x-hidden p-4 sm:p-8 bg-[#0a0a14] text-white">
@@ -112,22 +171,22 @@ export default function AdminPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                     <StatCard
                         title="Total Polls"
-                        value={stats.totalPolls}
+                        value={totalPolls}
                         icon={<ListChecks className="text-blue-400" />}
                     />
                     <StatCard
                         title="Total Voters"
-                        value={stats.totalVoters}
+                        value={totalVoters}
                         icon={<Users className="text-cyan-400" />}
                     />
                     <StatCard
                         title="Total Candidates"
-                        value={stats.totalCandidates}
+                        value={totalCandidates}
                         icon={<UserPlus className="text-violet-400" />}
                     />
                     <StatCard
                         title="Completed Polls"
-                        value={stats.completedPolls}
+                        value={totalCompletedPolls}
                         icon={<Check className="text-green-400" />}
                     />
                 </div>
@@ -139,16 +198,16 @@ export default function AdminPage() {
                         {/* VOTER APPLICATIONS */}
                         <Section
                             title="Pending Voter Applications"
-                            count={mockVoters.length}
-                            items={mockVoters}
+                            count={totalApprovableVoters}
+                            items={totalPendingVoters}
                             type="voter"
                         />
 
                         {/* CANDIDATE APPLICATIONS */}
                         <Section
                             title="Pending Candidate Applications"
-                            count={mockCandidates.length}
-                            items={mockCandidates}
+                            count={totalApprovableCandidates}
+                            items={totalPendingCandidates}
                             type="candidate"
                         />
 
@@ -156,42 +215,42 @@ export default function AdminPage() {
                         <div className="bg-[#0f1116] border border-[#1d1f2b] max-h-[50vh] rounded-2xl p-4 shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-semibold">Created Polls</h3>
-                                <span className="text-sm text-gray-400">{mockPolls.length} total</span>
+                                <span className="text-sm text-gray-400">{totalPolls} total</span>
                             </div>
 
                             <div className="hide-scrollbar max-h-[40vh] overflow-y-auto">
-                            {mockPolls.length === 0 ? (
-                                <div className="py-6 text-center text-gray-400">
-                                    No polls have been created yet
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {mockPolls.map((poll) => (
-                                        <div
-                                            key={poll.id}
-                                            className="p-3 bg-[#0b0c11] border border-[#15151b] rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-                                        >
-                                            <div>
-                                                <div className="font-semibold">{poll.title}</div>
-                                                <div className="text-xs text-gray-400">{poll.description}</div>
-                                                <div className="text-[11px] text-gray-500 mt-1 font-mono">
-                                                    {poll.startDate} → {poll.endDate}
+                                {mockPolls.length === 0 ? (
+                                    <div className="py-6 text-center text-gray-400">
+                                        No polls have been created yet
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {mockPolls.map((poll) => (
+                                            <div
+                                                key={poll.id}
+                                                className="p-3 bg-[#0b0c11] border border-[#15151b] rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
+                                            >
+                                                <div>
+                                                    <div className="font-semibold">{poll.title}</div>
+                                                    <div className="text-xs text-gray-400">{poll.description}</div>
+                                                    <div className="text-[11px] text-gray-500 mt-1 font-mono">
+                                                        {poll.startDate} → {poll.endDate}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <span
-                                                className={`text-xs px-2 py-1 rounded-lg ${poll.status === "Active"
+                                                <span
+                                                    className={`text-xs px-2 py-1 rounded-lg ${poll.status === "Active"
                                                         ? "bg-green-500 text-black"
                                                         : poll.status === "Completed"
                                                             ? "bg-gray-600 text-white"
                                                             : "bg-blue-500 text-black"
-                                                    }`}
-                                            >
-                                                {poll.status}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                                        }`}
+                                                >
+                                                    {poll.status}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
                             </div>
                         </div>
@@ -242,7 +301,7 @@ export default function AdminPage() {
 const Section: React.FC<{
     title: string;
     count: number;
-    items: { addr: string; name: string; image?: string }[];
+    items: VotersToBeApprovedType[] | CandidatesToBeApprovedType[];
     type: "voter" | "candidate";
 }> = ({ title, count, items, type }) => (
     <div className="bg-[#0f1116] border border-[#1d1f2b] rounded-2xl p-4 shadow-sm">
@@ -252,46 +311,55 @@ const Section: React.FC<{
         </div>
 
         {items.length === 0 ? (
-            <div className="py-6 text-center text-gray-400">No pending {type} applications</div>
+            <div className="py-6 text-center text-gray-400">
+                No pending {type} applications
+            </div>
         ) : (
             <div className="space-y-3 max-h-[50vh] overflow-y-auto hide-scrollbar">
-                {items.map((item, idx) => (
-                    <div
-                        key={`${item.addr}-${idx}`}
-                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#0b0c11] border border-[#15151b]"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg bg-[#090912] flex items-center justify-center overflow-hidden">
-                                {item.image ? (
-                                    <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        className="object-cover w-full h-full"
-                                    />
-                                ) : (
-                                    <UserPlus className="sm:w-6 sm:h-6 w-5 h-5 text-gray-500" />
-                                )}
-                            </div>
-                            <div>
-                                <div className="font-semibold sm:text-lg text-[14px]">
-                                    {item.name}
-                                </div>
-                                <div className="sm:text-xs text-gray-400 font-mono text-[12px]">
-                                    {item.addr}
-                                </div>
-                            </div>
-                        </div>
+                {items.map((item: any, idx) => {
+                    const address =
+                        type === "voter"
+                            ? item.voterAddress
+                            : item.candidateAddress;
 
-                        <div className="flex items-center gap-2">
-                            <Button
-                                className="px-3 cursor-pointer py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60"
-                                
-                            >
-                                Accept
-                            </Button>
+                    return (
+                        <div
+                            key={`${address ?? idx}`}
+                            className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#0b0c11] border border-[#15151b]"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-lg bg-[#090912] flex items-center justify-center overflow-hidden">
+                                    {item.image ? (
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="object-cover w-full h-full"
+                                        />
+                                    ) : (
+                                        <UserPlus className="sm:w-6 sm:h-6 w-5 h-5 text-gray-500" />
+                                    )}
+                                </div>
+                                <div>
+                                    <div className="font-semibold sm:text-lg text-[14px]">
+                                        {item.name}
+                                    </div>
+                                    <div className="sm:text-xs text-gray-400 font-mono text-[12px]">
+                                        {address &&
+                                            `${address.slice(0, 5)}...${address.slice(-5)}`}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    className="px-3 cursor-pointer py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60"
+                                >
+                                    Accept
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         )}
     </div>

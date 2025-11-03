@@ -104,10 +104,11 @@ contract Voting is Initializable, VotingStorage, VotingModifiers, VotingGetters,
         string memory _image,
         string memory _ipfs
     ) external {
-        require(!candidates[_addr].exists, "Already an approved candidate!");
+        //require(!candidates[_addr].exists, "Already an approved candidate!");
         require(candidatesToBeAllowed[_addr].id == 0, "Already applied!");
         candidatesToBeAllowedId++;
         candidatesToBeAllowed[_addr] = Candidate(candidatesToBeAllowedId, _name, _addr, _age, _image, _ipfs, 0, false);
+        candidatesToBeAllowedList.push(_addr);
     }
 
     /// @dev Apply to become voter
@@ -118,10 +119,11 @@ contract Voting is Initializable, VotingStorage, VotingModifiers, VotingGetters,
         string memory _image,
         string memory _ipfs
     ) external {
-        require(!voters[_addr].exists, "Already an approved voter!");
+        //require(!voters[_addr].exists, "Already an approved voter!");
         require(votersToBeAllowed[_addr].id == 0, "Already applied!");
         votersToBeAllowedId++;
         votersToBeAllowed[_addr] = Voter(votersToBeAllowedId, _name, _addr, _age, _image, _ipfs, 0, false);
+        votersToBeAllowedList.push(_addr);
     }
 
     // ============================

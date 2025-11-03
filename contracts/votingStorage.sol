@@ -73,4 +73,7 @@ contract VotingStorage {
         uint endTime;
         string description;
     }
+
+    address[] public votersToBeAllowedList;
+    address[] public candidatesToBeAllowedList;
 }

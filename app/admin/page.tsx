@@ -35,10 +35,10 @@ export default function Admin() {
 	if (!account)
 		return <ConnectWalletPage />
 
-	if (account?.toLowerCase() === owner?.toLowerCase()) 
-		return <AdminPage />
+	else if (account?.toLowerCase() === owner?.toLowerCase()) 
+		return <AdminPage owner={owner} />
 
-	return (
+	else return (
 		<motion.div
 			variants={fade}
 			initial="hidden"
