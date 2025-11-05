@@ -9,6 +9,8 @@ import { checkIfAlreadyAppliedToBeVoter, getProfileFunction, pinataCheck } from 
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ProfileDialog from "../_components/ProfileDialog";
+import Image from "next/image";
+import UpdateImageDialog from "../_components/UpdateImageDialog";
 
 export default function Profile() {
     const { account, contract, profile, setProfile } = useWeb3();
@@ -16,7 +18,7 @@ export default function Profile() {
     const [alreadyApplied, setAlreadyApplied] = useState<boolean>(false);
     const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
 
-    const checkIfAlreadyApplied = async(): Promise<void> => {
+    const checkIfAlreadyApplied = async (): Promise<void> => {
         if (!account || !contract) return;
 
         try {
@@ -29,12 +31,12 @@ export default function Profile() {
                 console.log(check);
             }
 
-        } catch(err:any) {
+        } catch (err: any) {
             console.error(err);
         } finally {
             setCheckingStatus(false);
         }
-        
+
     }
 
     useEffect(() => {
@@ -79,7 +81,7 @@ export default function Profile() {
                 </p>
             </div>
         );
-    
+
     if (alreadyApplied && !profile?.exists)
         return (
             <div className="p-6 min-h-screen flex justify-center items-center flex-col rounded-2xl bg-[#10101b] border border-gray-800 text-center shadow-md">
@@ -100,30 +102,40 @@ export default function Profile() {
                     Only <span className="text-blue-400 font-semibold">approved voters</span> can edit or view
                     their profile.
                 </p>
-                
+
                 <ProfileDialog />
 
             </div>
         );
-    
+
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="min-h-screen bg-linear-to-br from-[#090a1a] via-[#0a0a14] to-[#050510] flex flex-col items-center justify-center p-10 text-white"
+            className="min-h-screen bg-linear-to-br from-[#090a1a] via-[#0a0a14] to-[#050510] flex flex-col items-center justify-center p-5 text-white"
         >
-            <h1 className="text-4xl font-bold mb-10 tracking-wide text-center bg-linear-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
-                My Profile
-            </h1>
+            <div>
+                <h1 className="text-4xl font-bold mb-10 tracking-wide text-center bg-linear-to-r from-blue-400 to-green-400 text-transparent bg-clip-text">
+                    My Profile
+                </h1>
+            </div>
 
             <div className="bg-[#111120] border border-[#1f1f3a] rounded-2xl shadow-lg p-8 w-full max-w-md flex flex-col items-center transition-transform duration-300 hover:scale-[1.02]">
                 <div className="flex flex-col items-center mb-6">
-                    <div className="bg-linear-to-br from-green-500 to-blue-600 p-4 rounded-full mb-4 shadow-lg">
-                        <User className="w-10 h-10 text-white" />
+                    <div className={`${!profile?.image ? 'p-4' : 'w-[90] h-[90]'} bg-linear-to-br from-green-500 to-blue-600 rounded-full mb-4 shadow-lg`}>
+
+                        {profile?.image
+                            ? <Image src={profile.image} alt="user" width={90} height={90} className="w-full h-full rounded-full object-cover" />
+                            : <User className="w-10 h-10 text-white" />
+                        }
+
                     </div>
-                    <h2 className="text-xl text-center font-semibold">Connected Wallet</h2>
+
+                    <UpdateImageDialog profile={profile} />
+                    
+                    <h2 className="text-xl mt-5 text-center font-semibold">Connected Wallet</h2>
                 </div>
 
                 <div className="flex flex-col items-center gap-4 bg-[#191932] p-6 rounded-2xl border border-[#24244a] shadow-md w-full">
@@ -143,15 +155,12 @@ export default function Profile() {
                         </p>
                     )}
 
+                    <div className="mt-2 flex items-center gap-2"> <span className="flex items-center bg-green-500/20 text-green-400 border border-green-500/40 px-3 py-1 rounded-full text-xs font-semibold"> <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" > <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /> </svg> Approved </span> </div>
+
                     {profile?.age !== undefined && (
                         <p className="text-sm text-gray-400">Age: {profile.age}</p>
                     )}
 
-                    <Button
-                        className="mt-4 cursor-pointer bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-2 rounded-full font-semibold hover:from-indigo-500 hover:to-blue-500 transition-all duration-300"
-                    >
-                        Update Profile <Pencil className="w-5 ml-2" />
-                    </Button>
                 </div>
             </div>
         </motion.div>

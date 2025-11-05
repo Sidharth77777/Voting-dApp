@@ -11,11 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import CreatePoll from "./CreatePoll";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWeb3 } from "../context/Web3Context";
 import { AdminPageProps, CandidatesToBeApprovedType, VotersToBeApprovedType } from "@/types/types";
-import { getCandidatesLengthFunction, getCandidatesToBeAllowedFunction, getCompletedPollsLengthFunction, getTotalCandidatesToBeApprovedFunction, getTotalPollsLengthFunction, getTotalVotersToBeApprovedFunction, getVotersLengthFunction, getVotersToBeAllowedFunction } from "../context/contractFunctions";
+import { addVoterByApprovalFunction, changeOwnerFunction, getCandidatesLengthFunction, getCandidatesToBeAllowedFunction, getCompletedPollsLengthFunction, getTotalCandidatesToBeApprovedFunction, getTotalPollsLengthFunction, getTotalVotersToBeApprovedFunction, getVotersLengthFunction, getVotersToBeAllowedFunction } from "../context/contractFunctions";
 import StatCard from "./StatCard";
 import Section from "./Section";
+import toast from "react-hot-toast";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogDescription, DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 // mock data
 const mockVoters = Array(6).fill({
@@ -74,6 +78,8 @@ const mockPolls = [
 
 export default function AdminPage({ owner }: AdminPageProps) {
     const { account, contract } = useWeb3();
+    const router: AppRouterInstance = useRouter();
+    const [newOwner, setNewOwner] = useState<string>("");
     const [loadingAll, setLoadingAll] = useState<boolean>(false);
     const [totalVoters, setTotalVoters] = useState<number>(0);
     const [totalCandidates, setTotalCandidates] = useState<number>(0);
@@ -127,6 +133,49 @@ export default function AdminPage({ owner }: AdminPageProps) {
         if (!owner || !contract) return;
         fetchAll();
     }, [owner, contract]);
+
+    const handleChangeOwner = async () => {
+        if (!owner || !contract) return;
+
+        try {
+            const newAdmin = await changeOwnerFunction(contract, newOwner);
+            if (typeof newAdmin !== "string") {
+                toast.success("ADMIN of contract changed !");
+                fetchAll();
+            } else {
+                toast.error(newAdmin);
+                return;
+            }
+        } catch (err:any) {
+            console.error(err);
+            toast.error(err);
+            return;
+        }
+    }
+
+    const addVoterByApproval = async (voterAddress: string): Promise<void> => {
+        if (!owner || !contract) return;
+
+        try {
+            const res = await addVoterByApprovalFunction(contract, voterAddress);
+            if (!(typeof res === "string")) {
+                toast.success("Approved as Voter !");
+                fetchAll();
+            } else {
+                toast.error(res);
+            }
+
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err);
+            return;
+        }
+    }
+
+    const addCandidateByApproval = async (candidateAddress: string) => {
+        console.log("Iam a candidate");
+
+    }
 
     if (loadingAll) return (
         <div className="flex min-h-screen flex-col items-center justify-center h-40 space-y-3">
@@ -187,6 +236,7 @@ export default function AdminPage({ owner }: AdminPageProps) {
                             count={totalApprovableVoters}
                             items={totalPendingVoters}
                             type="voter"
+                            addVoterByApproval={addVoterByApproval}
                         />
 
                         {/* CANDIDATE APPLICATIONS */}
@@ -195,6 +245,7 @@ export default function AdminPage({ owner }: AdminPageProps) {
                             count={totalApprovableCandidates}
                             items={totalPendingCandidates}
                             type="candidate"
+                            addCandidateByApproval={addCandidateByApproval}
                         />
 
                         {/* CREATED POLLS */}
@@ -248,8 +299,65 @@ export default function AdminPage({ owner }: AdminPageProps) {
                         <div className="bg-[#0f1116] border border-[#1d1f2b] rounded-2xl p-6 shadow-sm">
                             <h3 className="text-lg font-semibold mb-4">Create Poll</h3>
 
-                            <CreatePoll />
+                            <Button
+                                onClick={() => router.push('/admin/create-poll')}
+                                className="w-full cursor-pointer mt-2 bg-linear-to-r from-green-500 to-emerald-600 text-black font-semibold py-2 rounded-lg hover:opacity-90 transition">
+                                Create New Poll
+                            </Button>
 
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="rounded-2xl bg-[#0f1116] border border-[#1d1f2b] p-6 shadow-lg hover:shadow-orange-500/10 transition-all">
+                                <Dialog>
+                                    {/* ✅ use asChild for correct trigger behavior */}
+                                    <DialogTrigger asChild>
+                                        <Button className="w-full mt-2 bg-linear-to-r from-orange-400 to-orange-700 text-black font-semibold py-2 rounded-xl shadow-md hover:from-orange-500 hover:to-orange-800 cursor-pointer transition-all">
+                                            Change Owner of Contract
+                                        </Button>
+                                    </DialogTrigger>
+
+                                    <DialogContent className="sm:max-w-md bg-[#101218] border border-[#1d1f2b] text-white rounded-2xl shadow-xl">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-semibold text-orange-400">
+                                                Change Contract Owner
+                                            </DialogTitle>
+                                            <DialogDescription className="text-gray-400">
+                                                Enter the new owner's wallet address below.
+                                                <br />
+                                                <span className="text-red-500 uppercase font-medium">This action cannot be undone <br />You cannot access the ADMIN page again without the new owner's approval ! </span>
+                                            </DialogDescription>
+                                        </DialogHeader>
+
+                                        <div className="py-4">
+                                            <input
+                                                placeholder="0x1234...abcd"
+                                                value={newOwner ?? ""}
+                                                onChange={(e) => setNewOwner(e.target.value)}
+                                                className="w-full px-3 py-2 rounded-lg bg-[#0c0e13] border border-[#2a2d3a] font-mono text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+                                            />
+                                        </div>
+
+                                        <DialogFooter className="flex justify-end gap-3">
+                                            <Button
+                                                disabled={!newOwner}
+                                                variant="outline"
+                                                className="border cursor-pointer border-gray-600 text-gray-300 hover:bg-gray-800"
+                                                onClick={() => setNewOwner("")}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                disabled={!newOwner}
+                                                className="bg-linear-to-r cursor-pointer from-orange-400 to-orange-700 text-black font-semibold hover:from-orange-500 hover:to-orange-800 transition-all"
+                                                onClick={handleChangeOwner}
+                                            >
+                                                Confirm Change
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                         </div>
 
 

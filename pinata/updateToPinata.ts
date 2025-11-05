@@ -1,21 +1,23 @@
 import { ImageCategory, UploadedImageType } from "@/types/types";
 
-export const uploadToPinata = async (file: File, category:ImageCategory): Promise<UploadedImageType | string> => {
+export const updateToPinata = async (file: File, category:ImageCategory, prevCID:string): Promise<UploadedImageType | string> => {
     if (!file) return "No File Selected";
     if (!category) return "Category Missing";
+    if (!prevCID) return "Current CID of Image Missing";
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("category", category);  
+    formData.append("prevCID", prevCID);  
 
     try {
-        const res = await fetch('/api/uploadToPinata', {
+        const res = await fetch('/api/updateToPinata', {
             method: 'POST',
             body: formData,
         });
 
         if (!res.ok) {
-            let message = "Upload failed!";
+            let message = "Update failed!";
             try {
                 const err = await res.json();
                 message = err.error || message;

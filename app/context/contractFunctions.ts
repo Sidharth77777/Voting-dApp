@@ -348,6 +348,30 @@ export const applyToBeCandidateFunction = async(contract:ethers.Contract, name:s
     }
 }
 
+// EDIT FUNCTIONS
+export const updateVoterImageFunction = async(contract:ethers.Contract, cid:string, url:string): Promise<string | boolean> => {
+    // if (!contract || !account) return;
+    if (!url) return "No Image Found"
+    if (!cid) return "No CID Found";
+
+    try {
+        const tx = await contract.updateVoterImage(url, cid);
+        await tx.wait();
+        return true;
+
+    } catch (err:any) {
+        console.error('Error Updating profile !',err);
+
+        const reason = err.reason || err.error?.message || err.data?.message || err.message;
+
+        if (reason?.includes("You are not a registered voter!")) return "You are not a registered voter!";
+        if (err.code === "ACTION_REJECTED") return "Transaction rejected by user.";
+        if (err.code === "INSUFFICIENT_FUNDS") return "Insufficient funds for gas.";
+
+        return "Something went wrong while fetching profile !";
+    }
+}
+
 // GETTER FUNCTIONS
 export const getProfileFunction = async(contract:ethers.Contract, account:string): Promise<string | VoterDataType> => {
     // if (!account || !contract) return;
@@ -492,10 +516,21 @@ export const getCompletedPollsLengthFunction = async(contract:ethers.Contract): 
 export const getTotalVotersToBeApprovedFunction = async(contract:ethers.Contract): Promise<number | string> => {
     // if(!owner || !contract) return;
     try {
-        const lengthInWei: ethers.BigNumberish = await contract.votersToBeAllowedId();
+        const lengthInWei: ethers.BigNumberish = await contract.getVotersToBeAllowedListLength();
         const length: number = Number(lengthInWei);
+        let validCount: number = 0;
 
-        return length;
+        for (let i = 0; i < length; i++) {
+            const addr: string = await contract.votersToBeAllowedList(i);
+            if (addr != ethers.ZeroAddress) {
+                const voter = await contract.votersToBeAllowed(addr);
+                if (!(voter.exists) && (voter.voterAddress !== ethers.ZeroAddress)) {
+                    validCount++;
+                }
+            }
+        }
+
+        return validCount;
     } catch (err:any) {
         console.error("Error fetching approvable voters length !",err)
 
@@ -506,10 +541,21 @@ export const getTotalVotersToBeApprovedFunction = async(contract:ethers.Contract
 export const getTotalCandidatesToBeApprovedFunction = async(contract:ethers.Contract): Promise<number | string> => {
     // if(!owner || !contract) return;
     try {
-        const lengthInWei: ethers.BigNumberish = await contract.candidatesToBeAllowedId();
+        const lengthInWei: ethers.BigNumberish = await contract.getCandidatesToBeAllowedListLength();
         const length: number = Number(lengthInWei);
+        let validCount: number = 0;
 
-        return length;
+        for (let i = 0; i < length; i++) {
+            const addr: string = await contract.candidatesToBeAllowedList(i);
+            if (addr != ethers.ZeroAddress) {
+                const candidate = await contract.candidatesToBeAllowed(addr);
+                if (!(candidate.exists) && candidate.candidateAddress !== ethers.ZeroAddress) {
+                    validCount++
+                }
+            }
+        }
+
+        return validCount;
     } catch (err:any) {
         console.error("Error fetching approvable candidates length !",err)
 
@@ -557,10 +603,12 @@ export const getVotersToBeAllowedFunction = async(contract:ethers.Contract): Pro
             pendingVoters.push(voterToBeAllowed);
         }
 
-        const formattedVoters: VotersToBeApprovedType[] = pendingVoters.map((voter) => ({
-            name: voter.name,
-            voterAddress: String(voter.voterAddress),
-            image: voter.image,
+        const formattedVoters: VotersToBeApprovedType[] = pendingVoters
+                .filter((voter) => voter.voterAddress && voter.voterAddress !== ethers.ZeroAddress)
+                .map((voter) => ({
+                    name: voter.name,
+                    voterAddress: String(voter.voterAddress),
+                    image: voter.image,
         }))
 
         return formattedVoters;
@@ -584,10 +632,12 @@ export const getCandidatesToBeAllowedFunction = async(contract:ethers.Contract):
             pendingCandidates.push(candidateToBeAllowed);
         }
 
-        const formattedCandidate: CandidatesToBeApprovedType[] = pendingCandidates.map((candidate) => ({
-            name: candidate.name,
-            candidateAddress: String(candidate.candidateAddress),
-            image: candidate.image,
+        const formattedCandidate: CandidatesToBeApprovedType[] = pendingCandidates
+            .filter((candidate) => candidate.candidateAddress && candidate.candidateAddress !== ethers.ZeroAddress)
+            .map((candidate) => ({
+                name: candidate.name,
+                candidateAddress: String(candidate.candidateAddress),
+                image: candidate.image,
         }))
 
         return formattedCandidate;

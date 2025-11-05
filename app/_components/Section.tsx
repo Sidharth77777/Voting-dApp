@@ -10,11 +10,15 @@ export default function Section({
   count,
   items,
   type,
+  addVoterByApproval,
+  addCandidateByApproval,
 }: {
   title: string;
   count: number;
   items: VotersToBeApprovedType[] | CandidatesToBeApprovedType[];
   type: "voter" | "candidate";
+  addVoterByApproval?: (voterAddress:string) => void;
+  addCandidateByApproval?: (candidateAddress:string) => void;
 }) {
   return (
     <div className="bg-[#0f1116] border border-[#1d1f2b] rounded-2xl p-4 shadow-sm">
@@ -65,7 +69,15 @@ export default function Section({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Button className="px-3 cursor-pointer py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60">
+                  <Button 
+                    onClick={() => {
+                        if (type === "voter" && addVoterByApproval) {
+                            addVoterByApproval((item as VotersToBeApprovedType).voterAddress);
+                        } else if (type === "candidate" && addCandidateByApproval) {
+                            addCandidateByApproval((item as CandidatesToBeApprovedType).candidateAddress);
+                        }
+                    }}
+                    className="px-3 cursor-pointer py-1 rounded-lg bg-green-500 text-black font-medium hover:bg-green-600 transition disabled:opacity-60">
                     Accept
                   </Button>
                 </div>

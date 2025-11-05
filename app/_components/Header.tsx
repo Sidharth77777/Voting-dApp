@@ -113,14 +113,14 @@ export default function Header() {
 					</h1>
 				</div>
 
-				<div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+				<div className="flex flex-wrap items-center justify-center gap-1 sm:gap-4">
 					{account ? (
 						<>
-							<span className="px-3 py-1 font-mono bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
+							<span className="sm:px-3 px-1 py-1 font-mono bg-gray-800 rounded-xl text-sm border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
 								{`${account.slice(0, 4)}...${account.slice(-4)}`}
 							</span>
 
-							<span className="px-3 py-1 bg-gray-800 rounded-xl text-sm flex items-center gap-1 border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
+							<span className="sm:px-3 px-2 py-1 bg-gray-800 rounded-xl text-sm flex items-center gap-1 border border-gray-700 shadow-sm hover:bg-gray-700 transition-all">
 								<Image
 									alt="ETH"
 									src={ETH}
