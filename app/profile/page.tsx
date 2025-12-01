@@ -5,7 +5,7 @@ import ConnectWalletPage from "../_components/ConnectWallet";
 import { useWeb3 } from "../context/Web3Context";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { checkIfAlreadyAppliedToBeVoter, getProfileFunction, pinataCheck } from "../context/contractFunctions";
+import { checkIfAlreadyAppliedToBeVoter, getProfileFunction, pinataCheck, applyToBeCandidateFunction } from "../context/contractFunctions";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import ProfileDialog from "../_components/ProfileDialog";
@@ -70,6 +70,24 @@ export default function Profile() {
         //pinataCheck();
     }, [account, contract]);
 
+    const applytoBeCandidate = async() => {
+        if (!account || !contract) return;
+        if (!profile) return;
+
+        try {
+            const res = await applyToBeCandidateFunction(contract, profile?.name, profile?.voterAddress, profile?.age, profile?.image, profile?.ipfs);
+            if (res && typeof res === "string") {
+                toast.error(res);
+            } else {
+                toast.success("Applied to be candidate successfully");
+            }
+
+        } catch(err:any) {
+            console.error(err);
+            toast.error("Error applying to be candidate");
+        }
+    }
+
     if (!account) return <ConnectWalletPage />;
 
     if (loading || checkingStatus)
@@ -133,7 +151,7 @@ export default function Profile() {
 
                     </div>
 
-                    <UpdateImageDialog profile={profile} />
+                    <UpdateImageDialog profile={profile!} />
                     
                     <h2 className="text-xl mt-5 text-center font-semibold">Connected Wallet</h2>
                 </div>
@@ -155,6 +173,12 @@ export default function Profile() {
                         </p>
                     )}
 
+                    {profile?.exists && (
+                        <Button variant="outline" onClick={applytoBeCandidate} className="mt-2 px-4 py-1 cursor-pointer text-sm flex items-center gap-2" >
+                            Apply to be candidate
+                        </Button>
+                    )}
+
                     <div className="mt-2 flex items-center gap-2"> <span className="flex items-center bg-green-500/20 text-green-400 border border-green-500/40 px-3 py-1 rounded-full text-xs font-semibold"> <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" > <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /> </svg> Approved </span> </div>
 
                     {profile?.age !== undefined && (
@@ -166,3 +190,4 @@ export default function Profile() {
         </motion.div>
     );
 }
+

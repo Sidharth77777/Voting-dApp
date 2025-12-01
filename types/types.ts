@@ -92,3 +92,16 @@ export interface CandidatesToBeApprovedType{
     candidateAddress: string;
     image?: string;
 }
+
+export interface Group {
+  id: bigint;                     
+  name: string;                   
+  image: string;                  
+  ipfs: string;                   
+  candidates: string[];           
+  requiresRegisteredVoters: boolean;
+  exists: boolean;
+  startTime: bigint;              
+  endTime: bigint;                
+  description: string;            
+}

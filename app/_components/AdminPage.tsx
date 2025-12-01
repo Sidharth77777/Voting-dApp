@@ -9,7 +9,6 @@ import {
     Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CreatePoll from "./CreatePoll";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3 } from "../context/Web3Context";

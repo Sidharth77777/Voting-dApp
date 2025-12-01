@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ABI, PROXY_CONTRACT_ADDRESS } from "./constants";
-import { WalletConnectParamsTypes, CandidateDataType, VoterDataType, VotersToBeApprovedType, CandidatesToBeApprovedType } from "@/types/types";
+import { WalletConnectParamsTypes, CandidateDataType, VoterDataType, VotersToBeApprovedType, CandidatesToBeApprovedType, Group } from "@/types/types";
 import { pinata } from '@/pinata/pinataConfig'
 
 export const pinataCheck = async() => {
@@ -97,23 +97,21 @@ export const changeOwnerFunction = async(contract:ethers.Contract, address:strin
     }
 }
 
-export const createGroupFunction = async (contract: ethers.Contract, name: string, image: string, ipfs: string, requiresRegisteredVoters: boolean, startDate: string, endDate: string): Promise<boolean | string> => {
+export const createGroupFunction = async (contract: ethers.Contract, name: string, image: string, ipfs: string, requiresRegisteredVoters: boolean, startDate: number, endDate: number, description:string): Promise<boolean | string> => {
     //if(!account || !contract) return;
     // e.g. "2025-10-31T15:00Z"
     if (!name) return "Group name is mandatory!";
 
-    const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
-    const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
-    if (isNaN(startTimestamp) || isNaN(endTimestamp)) return "Invalid date format!";
+    if (isNaN(startDate) || isNaN(endDate)) return "Invalid date format!";
  
-    if (startTimestamp >= endTimestamp) return "Start time must be before end time!";
+    if (startDate >= endDate) return "Start time must be before end time!";
 
-    if (endTimestamp <= currentTimestamp) return "End time must be in the future!";
+    if (endDate <= currentTimestamp) return "End time must be in the future!";
 
     try {
-        const tx = await contract.createGroup(name, image, ipfs, requiresRegisteredVoters, startTimestamp, endTimestamp);
+        const tx = await contract.createGroup(name, image, ipfs, requiresRegisteredVoters, startDate, endDate, description);
         await tx.wait();
 
         return true;
@@ -512,6 +510,30 @@ export const getCompletedPollsLengthFunction = async(contract:ethers.Contract): 
     }
 }
 // this only
+
+export const getGroupsFunction = async(contract:ethers.Contract): Promise<Group[] | boolean> => {
+    // if(!account) return false;
+    try{
+        const totalGroupsBig = await contract.groupId();
+        const totalGroups: number = Number(totalGroupsBig);
+        const groupsArray: Group[] = [];
+
+
+        for (let i=0; i <= totalGroups; i++) {
+            const group: Group = await contract.groups(i);
+            if (group.exists) {
+                groupsArray.push(group);
+            }
+        }
+        
+        console.log(totalGroups, groupsArray);
+        return groupsArray; 
+
+    } catch(err:any) {
+        console.error("Error fetching groups !",err);
+        return false;
+    }
+}
 
 export const getTotalVotersToBeApprovedFunction = async(contract:ethers.Contract): Promise<number | string> => {
     // if(!owner || !contract) return;
